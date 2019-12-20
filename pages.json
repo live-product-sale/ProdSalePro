@@ -1,0 +1,32 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index"
+		},
+		{
+			"path" : "pages/login/login"
+		},
+		{
+			"path" : "pages/login/forget"
+		},
+		{
+			"path" : "pages/login/register"
+		},{
+            "path" : "pages/cus_pages/livePlayer/livePlayer",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/bus_pages/livePusher/livePusher",
+            "style" : {}
+        },
+		{
+			"path" : "pages/zhiwen-livepush/zhiwen-livepush"
+		}
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "uniapp",
+		"navigationBarBackgroundColor": "#b49950",
+		"backgroundColor": "#b49950"
+	}
+}
