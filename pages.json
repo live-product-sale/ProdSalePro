@@ -1,16 +1,28 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+	"pages": [
 		{
-			"path": "pages/index/index"
+			"path": "pages/index/index",
+			"style": {
+				  "navigationBarTitleText": "首页" 
+			}
 		},
 		{
-			"path" : "pages/login/login"
+			"path" : "pages/login/login",
+			"style": {
+				  "navigationBarTitleText": "登陆" 
+			}
 		},
 		{
-			"path" : "pages/login/forget"
+			"path" : "pages/login/forget",
+			"style": {
+				  "navigationBarTitleText": "重置密码" 
+			}
 		},
 		{
-			"path" : "pages/login/register"
+			"path" : "pages/login/register",
+			"style": {
+				  "navigationBarTitleText": "注册账户" 
+			}
 		},{
             "path" : "pages/cus_pages/livePlayer/livePlayer",
             "style" : {}
@@ -18,14 +30,11 @@
         ,{
             "path" : "pages/bus_pages/livePusher/livePusher",
             "style" : {}
-        },
-		{
-			"path" : "pages/zhiwen-livepush/zhiwen-livepush"
-		}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
-		"navigationBarTitleText": "uniapp",
+		"navigationBarTitleText": "农产品销售",
 		"navigationBarBackgroundColor": "#b49950",
 		"backgroundColor": "#b49950"
 	}

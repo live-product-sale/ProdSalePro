@@ -14,7 +14,14 @@ function fetch(options) {
 			header: headers,
 			method: options.method,
 			data: options.data || null,
-			success:(res) => { resolve(res.data) },
+			success:(res) => { 
+				const result = res.data
+				console.log(result)
+				if(result.data && result.data.token) {
+					uni.setStorageSync('token', result.data.token)
+				  }
+				resolve(result) 
+				},
 			fail: (err) => { reject(err)}
 		})
 	}) 

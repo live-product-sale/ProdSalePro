@@ -1,7 +1,6 @@
 <template>
 	<view>
 		<view>播放器</view>
-	
 	</view>
 </template>
 
@@ -10,7 +9,7 @@
 		data() {
 			return {
 				player: null,    // 放置播放器
-				liveplayurl: 'rtmp://zhangly.xyz/live/test?txSecret=0276f067d794f4d136f3e9592360170a&txTime=5DF8ED6F',  // 拉流地址
+				liveplayurl: 'rtmp://zhangly.xyz/live/test?txSecret=67f1e2c359f98e8231b1c96913903f7a&txTime=5E04CAEF',  // 拉流地址
 				currentWebView: null ,//容器存放当前页面
 				
 			}
@@ -42,19 +41,18 @@
 			 * 创建播放器，即 拉流对象
 			 */
 			plusPlay() {
-				console.log(this.player,this.liveplayurl)
 				this.player = new plus.video.VideoPlayer('play', {
 					src: this.liveplayurl,
 					top: '100upx',
 					left: '0px',
 					width: '100%',
-					height: '300px',
+					height: uni.getSystemInfoSync().windowHeight -100 + 'px',
 					position: 'static',
 					objectFit: 'fill'
 					
 				})
 				// console.log('player', this.player)
-				console.log('webview', this.currentWebView)
+				// console.log('webview', this.currentWebView)
 				this.currentWebView.append(this.player)
 				// console.log(this.currentWebView)
 			}

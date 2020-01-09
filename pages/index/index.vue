@@ -1,12 +1,12 @@
 <template>
 	<view class="content">
-		<image class="logo" src="../../static/kitty-BasicLogin/logo.png"></image>
 		<view class="text-area">
 			<text class="title">{{title}}</text>
 		</view>
 		 <navigator url="/pages/login/login" hover-class="other-navigator-hover">
 		      <button type="default">跳转登陆页面</button>
 		 </navigator>
+		 <button type="default" @click="logOut">退出应用</button>
 		 <view>
 			 <navigator url="/pages/bus_pages/livePusher/livePusher">主播端</navigator>
 			 <navigator url="/pages/cus_pages/livePlayer/livePlayer">观众端</navigator>
@@ -16,13 +16,19 @@
 
 <script>
 	export default {
-		data() {
+		data(){
 			return {
 				title: 'Hello'
 			}
 		},
 		onLoad() {
-
+			// 如果token不存在，跳转登陆页面
+           const token = uni.getStorageSync('token')
+		   if(!token) {
+			   uni.redirectTo({
+			   	url: '../login/login'
+			   });
+		   }
 		},
 		onShow() {
 			uni.showToast({
@@ -32,7 +38,15 @@
 			})
 		},
 		methods: {
-
+            logOut: function() {
+				uni.clearStorageSync()
+				uni.reLaunch({
+					url: '../login/login'
+				})
+				// #ifdef APP-PLUS  
+				// plus.runtime.quit();    // 只是退到后台，没有杀死进程 
+				// #endif
+			}
 		}
 	}
 </script>
