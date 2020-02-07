@@ -1,0 +1,15 @@
+<template>
+	<div>
+		直播室头部标签
+	</div>
+</template>
+
+<script>
+	export default {
+		
+	}
+</script>
+
+<style>
+
+</style>
