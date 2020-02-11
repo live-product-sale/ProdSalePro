@@ -3,7 +3,7 @@
 		<view class="uni-form-item">
 			<input 
 			  class="uni-input" 
-			  v-model="userinfo.cname" 
+			  v-model="userinfo.cphone" 
 			  type="text" 
 			  placeholder="账号名称">
 		</view>
@@ -52,7 +52,7 @@
 			return {
 				capturl: 'http://49.235.51.111:3000/api/v1/user/login/captcha?flag=1',
 				userinfo: {
-					cname: '',
+					cphone: '',
 					cpassword: '',
 					code: ''
 				}
