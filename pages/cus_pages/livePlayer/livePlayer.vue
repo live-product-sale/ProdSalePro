@@ -13,8 +13,8 @@
 		},
 		onLoad() {
 			// 页面生命周期，页面加载时启动，参数是上个页面传递的参数，用于页面传参
-			this.getSubNvue()
 			this.getwebView()        //获取当前webviewå
+			this.getSubNvue()
 		},
 		onBackPress() {
 			this.player.close()
@@ -56,9 +56,9 @@
 			 * 获取子窗口
 			 */
 			getSubNvue() {
-				const product = uni.getSubNVueById('product')
+				const product = uni.getSubNVueById('liveProduct')
 				product.show()
-				const barrage = uni.getSubNVueById('barrage')
+				const barrage = uni.getSubNVueById('liveBarrage')
 				barrage.show()
 				const liveFooter = uni.getSubNVueById('liveFooter')
 				liveFooter.show()

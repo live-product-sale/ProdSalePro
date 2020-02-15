@@ -4,8 +4,8 @@
 			<input 
 			  class="uni-input" 
 			  v-model="userinfo.cphone" 
-			  type="text" 
-			  placeholder="账号名称">
+			  type="number"  
+			  placeholder="账号名称/手机号">
 		</view>
 		<view class="uni-form-item">
 			<input 

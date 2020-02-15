@@ -10,8 +10,33 @@ const USERINFO = uni.getStorageSync('userinfo') || {}
 // 状态管理
 const store  = new Vuex.Store({
 	state:{
-		token: TOKEN
-	}
+		 // 全局变量定义处
+		hasLogin: false,          // 用户是否登陆
+		token: TOKEN,             // token
+		userInfo: {}              // 用户信息
+	},
+	mutations: {
+		// 全局方法定义处
+		login(state, provider) {
+			state.hasLogin = true
+			state.userInfo = provider
+			uni.setStorage({
+				key: "userInfo",
+				data: provider
+			})
+			console.log('userinfo', provider)
+		},
+		logout(state) {
+			state.hasLogin = false
+			state.userInfo = {}
+			uni.removeStorage({
+				key: "userInfo"
+			})
+		}
+	},
+	actions: {
+		
+	},
 })
 
 export default store
