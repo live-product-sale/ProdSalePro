@@ -1,15 +1,93 @@
 <template>
-	<div>
-		<view>弹幕</view>
-	</div>
+	<view class="content">
+	   <template v-for="(item, index) in items" >
+		   <view class="danmuitem" :key="index" >
+		   	  <text class="danmuname" :style="{
+				  color: getRandomColor()
+			  }">{{item.name}}</text> 
+			  <text class="danmumes" :style="{
+				  color: getRandomColor()
+			  }">{{item.message}}</text>
+		   </view>
+	   </template>
+	</view>
 </template>
 
 <script>
 	export default {
+		onLoad() {
+			console.log("ok")
+			const task = uni.connectSocket({
+			  url: 'ws://192.168.43.118:4000/socket',
+			  complete: ()=> {}
+			});
+			console.log(task)
+			
+			uni.$on("barrage", (data) => {
+				this.addDanMu(data.name, data.msg)
+			})
+		},
+		data() {
+			return {
+				items:[]   //弹幕容器
+			}
+		},
+		methods: {
+			// 弹幕字体颜色
+		    getRandomColor() {
+			  let rgb = []
+			  for (let i = 0; i < 3; ++i) {
+				let color = Math.floor(Math.random() * 256).toString(16)
+				color = color.length == 1 ? '0' + color : color
+				rgb.push(color)
+			  }
+			  return '#' + rgb.join('')
+			},
+			// 添加弹幕
+			addDanMu(name, message, socket) {
+				const id = this.items.length
+				// socket.emit('get barrage from user', { name, message })
+				if(id >= 7) {
+					this.items.pop()
+				}
+				this.items.push({
+					id: id + 1,
+					name,
+					message
+				})
+			}
+		},
 		
+		onUnload() {
+			uni.$off('barrage')
+		}
 	}
 </script>
 
-<style>
-
+<style lang="scss">
+	.content {
+		flex-direction: column;
+		padding-top: 5px;
+	}
+	.danmuitem {
+		flex-direction: row;
+		justify-content: flex-start;
+		padding:5upx 5px ;
+	}
+	.danmuname {
+		background-color: rgba(0,0,0,0.4); 
+		border-top-left-radius: 5px;
+		border-bottom-left-radius: 5px;
+		color: #F0AD4E;
+		font-size: 13px;
+		padding: 4px 7px;
+	}
+	.danmumes {
+		background-color: rgba(0,0,0,0.4); 
+		border-top-right-radius: 5px;
+		border-bottom-right-radius: 5px;
+		color: #FFFFFF;
+		font-size: 13px;
+		padding: 4px 10px 4px 4px;
+	}
 </style>

@@ -1,15 +1,119 @@
 <template>
-	<div>
-		商品列表
-	</div>
+	<scroll-view class="content" show-scrollbar="false" >
+		<text class="title">全部宝贝{{product.length}}</text>
+		<view v-if="product.length === 0">
+		   <text>商品为空</text>
+		</view>
+		<list show-scrollbar="false">
+			<cell class="product-item" v-for="(item , index) in product" :key="index">
+				<image class="prod-image" :src="item.goods_avatar" mode="aspectFit"></image>
+				<view class="prod-info">
+					<text class="prod-desc">{{item.goods_name}}</text>
+					<view class="price">
+						<text style="color:#E45E47; font-size: 30upx;">¥{{item.goods_price}}</text>
+						<view class="cart" hover-class="cart-hover" >
+							<uni-icon type="cart" color="#E45E47" size="20"  @tap="toDetail(item.goods_id)"></uni-icon>
+						</view>
+					</view>
+				</view>
+			</cell>
+		</list>
+	</scroll-view> 
 </template>
 
 <script>
+	import uniIcon from '@/components/uni-icons/uni-icons.vue'
+	// import uniPopup from '@/components/uni-popup/uni-popup.vue'
+	
 	export default {
-		
+		components: {
+			uniIcon
+		},
+		data(){
+			 return {
+				 product: []
+			 }
+		},
+		methods:{
+			toDetail(goodsId) {
+				uni.$emit("goods_id", { goods_id: goodsId })
+			    uni.$emit('isDetail', { isShowproduct: false, isShowdetail: true })
+				uni.showToast({
+					title:'详情页面'
+				})
+			}
+		},
+		onLoad() {
+			const subNvue = uni.getCurrentSubNVue()
+			subNvue.onMessage(({data}) => {
+				this.product = data.productData
+			})		
+		}
 	}
 </script>
 
 <style>
-
+  .content {
+	  justify-content: flex-start;
+	  align-items: center;
+	  flex-direction: column;
+	  padding-top: 50upx;
+  }
+  .title {
+	  position: fixed;
+	  top: 20upx;
+	  left: 0;
+	  right: 0;
+	  text-align: center;
+	  color: #E45E47;
+	  font-size: 28upx;
+  }
+  .product-item {
+	  flex-direction: row;
+	  justify-content: flex-start;
+	  border-radius: 10upx;
+	  align-items: center;
+	  width: 700upx;
+	  height: 250upx;
+	  border-bottom-width: 1px;
+	  border-bottom-color: #EFEFF4;
+  }
+  .prod-image {
+	  width: 200upx;
+	  height: 200upx;
+	  border-radius: 10upx;
+  }
+  .prod-info {
+	  flex-direction: column;
+	  justify-content: space-between;
+	  align-items: flex-start;
+	  padding: 20upx 20upx;
+	  height: 200upx;
+	  width: 500upx;
+  }
+  .prod-desc {
+	  flex-wrap: wrap;
+	  height: 110upx;
+	  text-overflow: ellipsis;
+	  font-size: 28upx;
+	  line-height: 28upx;
+  }
+  .cart-hover {
+	  background-color:  #EEEEEE;
+	  color: #FFFFFF;
+  }
+  .cart {
+	  width: 70upx;
+	  height: 70upx;
+	  justify-content: center;
+	  align-items: center;
+	  border-radius: 35upx;
+	  border-color: #E45E47;
+	  border-width: 1upx;
+  }
+  .price {
+	  flex-direction: row;
+	  width: 430upx;
+	  justify-content: space-between;
+  }
 </style>

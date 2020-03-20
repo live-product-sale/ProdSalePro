@@ -1,8 +1,8 @@
 import config from '../config/index.config.js'
-
-const token = uni.getStorageSync('token') || ""
+import { msg } from './index.js'
 
 function fetch(options) {
+	const token = uni.getStorageSync('token') || ""
 	const headers = {
 		'Content-Type': 'application/json',
 		'Authorization': `Bearer ${token}`
@@ -14,13 +14,14 @@ function fetch(options) {
 			header: headers,
 			method: options.method,
 			data: options.data || null,
-			success:(res) => { 
+			success:(res) => {
 				const result = res.data
-				console.log(result)
-				if(result.data && result.data.token) {
-					uni.setStorageSync('token', result.data.token)
-				  }
-				resolve(result) 
+				if(result.code === "000004") {
+					msg('您未登陆, 请先登陆')
+				} else if(result.code !== "000000") {
+					msg('错误码:'+result.code)
+				}
+				resolve(result)
 				},
 			fail: (err) => { reject(err)}
 		})

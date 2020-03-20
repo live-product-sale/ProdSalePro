@@ -1,15 +1,128 @@
 <template>
-	<div>
-		直播室头部标签
-	</div>
+	<view class="content" style="background: #FFFFFF;">
+		<view class="left">
+			<image class="avatar"  :src="liveInfo.shop_avatar" mode="aspectFit" />
+			<text class="userinfo">{{liveInfo.shop_name}}</text>
+			<view class="like" type="primary"  size="mini" @click="likebtn" >
+				<text class="likeword" v-if="liveInfo.isfollow=== false">关注</text>
+				<text class="likeword" v-else-if="liveInfo.isfollow === true">已关注</text>
+			</view> 
+		</view>
+		<view class="right">
+			<text style="color: #FFFFFF;font-size: 12px;">直播ID:</text>
+			<text style="color: #FFFFFF;font-size: 24upx;">{{liveInfo.live_id}}</text>
+		</view>
+		<view class="backicon">
+			<uni-icon @click="backLive" type="closeempty" size="20" color="rgba(0,0,0,0.5)"></uni-icon>
+		</view>
+	</view>
 </template>
 
 <script>
+	import uniIcon from '@/components/uni-icons/uni-icons.vue'
 	export default {
-		
+		components: {
+			uniIcon
+		},
+		data() {
+			return {
+				liveInfo: {
+					// shop_name: '',
+					// live_id: '',
+					// shop_avatar: '',
+					// status: false
+				}
+			}
+		},
+		onLoad() {
+			const liveHead = uni.getCurrentSubNVue()
+			liveHead.onMessage(({data}) => {
+				this.liveInfo = data.liveHeadInfo
+			})
+		},
+		methods:{
+			likebtn() {
+				console.log(this.liveInfo)
+				this.liveInfo.isfollow = !this.liveInfo.isfollow
+				uni.$emit("likeRoom", { data: this.liveInfo })
+				if(this.liveInfo.isfollow) {
+					uni.showToast({
+						title: '您已关注该直播间',
+					})
+				} else {
+					uni.showToast({
+						title:'您已取消关注该直播间'
+					})
+				}
+			},
+			backLive() {
+				uni.showToast({
+					title: '退出直播室'
+				})
+			}
+		}
 	}
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+     .content {
+		 flex-direction: row;
+		 height: 80px;
+		 justify-content: space-between;
+		 align-items: center;
+		 padding-top: 30px;
+		 padding-bottom: 0;	
+	 }
+	 .left {
+		 justify-content: center;
+		 margin-left: 20upx;
+		 flex-direction: row;
+		 align-items: center;
+		 position: relative;
+		 height: 100upx;
+		 line-height: 80upx;
+		 border-radius: 50px;
+		 background-color:rgba(0,0,0,0.5) ;
+	 }
+	 .avatar {
+		 margin: 0 6upx 0 14upx;
+		 width: 100upx;
+		 height: 100upx;
+		 border-radius: 50upx; 
+	 }
+	 .userinfo {
+		 margin: 0 0;
+		 color: #FFFFFF;
+		 font-size: 24upx;
+		 width: 150upx;
+		 flex-direction: row;
+		 justify-content: center;
+		 flex-wrap: wrap;
+	 }
+	 .like {
+		background-color:#ed1c24;
+		padding: 20upx 10upx;
+		justify-content: center;
+		border-radius: 30upx;
+		height: 70upx;
+		text-align: center;
+		border-width:0 ;
+		margin: 0 14upx 0 14upx;
+	 }
+	 .likeword {
+		 text-align: center;
+		 color: #FFFFFF;
+		 font-size: 14px;
+		 margin: 14upx 14upx;
+	 }
+	 .right {
+		 width: 200upx;
+		 flex-direction: column;
+		 justify-content: center;
+		 align-items: center;
+		 height: 80upx;
+		 line-height: 90upx;
+		 border-radius: 50px;
+		 background-color:rgba(0,0,0,0.5) ;
+	 }
 </style>
