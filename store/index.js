@@ -8,8 +8,13 @@ const hasLogin = uni.getStorageSync("hasLogin") || false
 // 状态管理
 const store  = new Vuex.Store({
 	state:{
-		hasLogin: hasLogin,          // 用户是否登陆
+		// 网络状态改变
+		netWorkChange: true,
+		// 用户是否登陆
+		hasLogin: hasLogin,
+		// 用户信息
 		info: Info,
+		// 用户token
 		token: Token
 	},
 	mutations: {
@@ -34,11 +39,20 @@ const store  = new Vuex.Store({
 			state.info = {}
 			state.token = ""
 			uni.clearStorageSync()	
-		}
+		},
+		// 改变网络状态
+		changeNetWork(state, status) {
+			state.netWorkChange = status;
+		},
 	},
 	actions: {
 		
 	},
+	getters: {
+		netWorkStatus(state, getters) {
+			return state.netWorkChange
+		}
+	}
 })
 
 export default store

@@ -1,6 +1,12 @@
 <template>
 	<scroll-view class="content" show-scrollbar="false" >
 		<text class="title">全部宝贝{{product.length}}</text>
+	    <uni-icon
+	      class="exit" 
+	      type="closeempty" 
+	      size="20" 
+	      color="#DDDDDD"
+	      @click="exit"></uni-icon>
 		<view v-if="product.length === 0">
 		   <text>商品为空</text>
 		</view>
@@ -11,8 +17,8 @@
 					<text class="prod-desc">{{item.goods_name}}</text>
 					<view class="price">
 						<text style="color:#E45E47; font-size: 30upx;">¥{{item.goods_price}}</text>
-						<view class="cart" hover-class="cart-hover" >
-							<uni-icon type="cart" color="#E45E47" size="20"  @tap="toDetail(item.goods_id)"></uni-icon>
+						<view class="cart" hover-class="cart-hover"   >
+							<uni-icon type="cart" color="#E45E47" size="20" @click="toDetail(item.goods_id)"></uni-icon>
 						</view>
 					</view>
 				</view>
@@ -23,7 +29,6 @@
 
 <script>
 	import uniIcon from '@/components/uni-icons/uni-icons.vue'
-	// import uniPopup from '@/components/uni-popup/uni-popup.vue'
 	
 	export default {
 		components: {
@@ -37,10 +42,14 @@
 		methods:{
 			toDetail(goodsId) {
 				uni.$emit("goods_id", { goods_id: goodsId })
-			    uni.$emit('isDetail', { isShowproduct: false, isShowdetail: true })
-				uni.showToast({
-					title:'详情页面'
-				})
+				const product = uni.getSubNVueById("liveProduct")
+				product.hide("slide-out-bottom")
+				const isDetail = uni.getSubNVueById("prodDetail")
+				isDetail.show("slide-in-bottom")
+			},
+			exit() {
+				const subNvue = uni.getCurrentSubNVue()
+				subNvue.hide("slide-out-bottom")
 			}
 		},
 		onLoad() {
@@ -58,6 +67,11 @@
 	  align-items: center;
 	  flex-direction: column;
 	  padding-top: 50upx;
+  }
+  .exit {
+	  position: fixed;
+	  right: 30upx;
+	  top: 20upx;
   }
   .title {
 	  position: fixed;

@@ -15,7 +15,7 @@ const BucketConfig = {
  * @param {String} Dir
  * @return {String} imgURL
  * */
-function upImg(fileName, filePath, dir) {
+export function upImg(fileName, filePath, dir) {
 	if(!dir) {
 		dir = 'img/'
 	}
@@ -29,10 +29,42 @@ function upImg(fileName, filePath, dir) {
 			    console.log(JSON.stringify(progressData));
 			}
 		}, (err, data) => {
-			console.log(err || data)
+			// console.log(err || data)
 			if(err) { reject(err) }
 			resolve(data)
 		})
 	})
 }
-export default upImg
+/**
+ * 压缩图片
+ * @param {String} imgurl
+ * @return {type}
+ * */
+export function compressImage(imgurl) {
+	console.log(imgurl)
+	const options = {
+		src: imgurl,
+		dst: imgurl,
+		overwrite:true,
+		quality: 100,
+		format: "jpg",
+		width: "100px",
+		height:"100px"
+	}
+    return new Promise((resolve, reject) => {
+		// #ifdef APP-PLUS
+		plus.zip.compressImage(options, async (success) => {
+			console.log(success)
+			const urlArray = success.target.split("/")
+			const fileName = urlArray[urlArray.length - 1]
+			const result = await upImg(fileName, success.target)
+			console.log(result)
+			resolve(result)
+		}, (error) => {
+			reject(error)
+			console.log(error)
+		})
+		// #endif
+	})	
+	
+}

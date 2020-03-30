@@ -2,16 +2,28 @@
 	<view class="content">
 		<view class="header" >
 			<view class="userinfo">
-				<view class="face"><image :src="'http://'+userInfo.avatar"></image></view>
+				<view class="face">
+					<template v-if="userInfo.avatar!== null">
+						<image :src="'http://'+userInfo.avatar" mode="aspectFill" lazy-load="true"></image>
+					</template>
+					<template v-else>
+						<image src="../../../static/imgs/st_pic.png" mode="aspectFill" lazy-load="true"></image>
+					</template>
+				</view>
 				<view class="info">
-					<view class="username">{{userInfo.name}}</view>
+					<template v-if="userInfo.name !== null">
+						<view class="username">{{userInfo.name}}</view>
+					</template>
+					<template v-else>
+						<view class="username">未设置用户名</view> 
+					</template>
 				</view>
 			</view>
 		</view>
 		<!-- 订单列表 -->
 		<view class="order_status">
 			<view class="status" v-for="item in status" :key="item.key" @click="navToPage(item.to_page, item.name)">
-				<image class="icon" :src="item.url" mode="aspectFill" lazy-load="true"></image>
+				<image class="icon" :src="item.url" lazy-load="true"></image>
 				<text>{{item.name}}</text>
 			</view>
 		</view>
@@ -91,6 +103,11 @@
 						name: '关于我们',
 						icon: '../../../static/fumou-center-template/10.png',
 						key: 6,
+					},
+					{
+						name: '检查更新',
+						icon: '../../../static/fumou-center-template/10.png',
+						key: 7,
 					}
 				
 				]
@@ -106,12 +123,7 @@
 			...mapMutations(["setLogoutState"]),
 			// 页面初始化
 			init() { 
-				if(!this.userInfo["name"]) {
-					this.userInfo["name"] = "未设置用户名"
-				}
-				if(!this.userInfo["avatar"]) {
-					this.userInfo["avatar"] = "../../../static/logo/systemUser.png"
-				}
+				// console.log(this.userInfo)
 			},
 		    //退出登录
 		    toLogout(){
@@ -166,9 +178,9 @@
 		.userinfo{
 			width:90%;display:flex;
 			flex-direction: row;
-			align-items: center;
+			align-items: flex-end;
 			.face{flex-shrink:0;width:20vw;height:20vw;
-				image{width:100%;height:100%;border-radius:100%;border: 2px solid #FFFFFF;}
+				image{width:100%;height:100%;border-radius:100%;border: 2px solid #FFFFFF;background: #FFFFFF;}
 			}
 			.info{
 				display:flex;flex-flow:wrap;padding-left:30upx;

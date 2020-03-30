@@ -12,7 +12,7 @@
 				  placeholder-class="place-input"
 				  v-model="userinfo.cphone" 
 				  type="number"  
-				  placeholder="手机号">
+				  placeholder="手机号" />
 			</view>
 			<view class="inputCode">
 				<input
@@ -39,7 +39,7 @@
 	</view>
 </template>
 <script>
-	import md5 from '../../node_modules/js-md5'
+	import md5 from '@/common/js-md5/src/md5.js'
 	import { mapMutations } from 'vuex'
 	import config from '../../config/index.config.js'
 	
@@ -81,6 +81,9 @@
 					uni.reLaunch({
 						url: '/pages/cus_pages/home/home'
 					})
+				} else if( result.code === "000005" ) {
+					this.reloadcheck()
+					this.$apis.msg(result.msg)
 				} else {
 					this.init()
 					this.$apis.msg(result.msg)
@@ -110,7 +113,7 @@
 
 <style lang="scss">
 	page {
-		background: $color-primary;
+		background: $color-login;
 	}
 	.content {
 		display: flex;
@@ -198,7 +201,7 @@
 			.login-btn {
 				width: 600upx;
 				height: 76upx;
-				background: $color-primary;
+				background: $color-login;
 				color: #FFFFFF;
 				font-size: 30upx;
 			}

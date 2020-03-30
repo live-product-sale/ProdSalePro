@@ -55,6 +55,7 @@ export const changeCartStatus = (data) => http.GET('/cart/status', data)
 export const changCartNum = (data) => http.GET('/cart/goods_num', data)
 // 清空购物车
 export const deleteCartByuid = (data) => http.POST('/cart/deleteAll', data)
+
 /*****************************商店模块*******************************/
 export const createShop = (data) => http.POST('/shop/create', data)
 // 商家接口
@@ -89,6 +90,8 @@ export const cancelOrder = (data) => http.POST('/order/cancelOrder', data)
 export const deleteOrder = (data) => http.POST('/order/deleteOrder', data)
 // 确认收货订单
 export const confirmOrder = (data) => http.POST('/order/confirmOrder', data)
+// 订单评论
+export const finishAssess = (data) => http.POST('/order/assess', data)
 
 /***************************地址管理模块 ********************************/
 export const getAddressData = (data) => http.GET('/address/addressList', data)
@@ -98,10 +101,14 @@ export const updateOrCreate = (data) => http.POST('/address/createOrupdate', dat
 export const getDefaultAddress = (data) => http.GET('/address/default', data)
 // 修改默认地址
 export const changedefault = (data) => http.GET('/address/changeDefault', data)
+// 删除地址
+export const deleteAddressById = (data) => http.POST('/address/deletebyid', data)
 
 /*****************************直播分类模块**********************************/
 // 获取某个范围的类型
 export const getTabInfo = (data) => http.GET('/sort/range_id', data)
+export const getAllRange = (data) => http.GET('/sort/range', data)
+export const getAllSortByRangeId = (data) => http.GET('/sort/sortByrangeId', data)
 /*****************************搜索模块**************************************/
 export const search = data => http.GET('/search/key', data)
 
@@ -126,5 +133,14 @@ export const msg = (title, duration=1500, mask=false, icon='none')=>{
 		mask,
 		icon
 	});
+}
+export function debounce(fn, interval = 400) {
+	let timeout = null
+	return function() {
+		clearTimeout(timeout)
+		timeout = setTimeout(() => {
+			fn.apply(this, arguments)
+		}, interval)
+	}
 }
 /***********************使用测试数据**********************/

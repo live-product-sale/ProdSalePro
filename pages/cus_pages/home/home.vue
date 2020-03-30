@@ -53,20 +53,16 @@
 		methods: {
 			// 页面初始化
 			async init() {
-				const params = { offset: 0, limit: 3 }
-				const specData = await this.$apis.getLiveList(params)
+				this.status = 'loading'
+				this.showIcon = true
+				this.offset = 0      // 偏移量
+				this.limit = 10      // 获取数据量
+				const specData = await this.$apis.getLiveList({ offset: 0, limit: 3 })
 				if(specData.code === "000000") {
 					this.speciaLive = specData.data
 				}
 				const data = { offset: this.offset, limit: this.limit }
-				const result = await this.$apis.getLiveList(data)
-				if(result.code = "000000") {
-					this.liveList = result.data
-					this.status = 'loading',
-					this.showIcon = true
-				}
-				this.offset = 0      // 偏移量
-				this.limit = 10      // 获取数据量
+				this.getLiveList(data)
 			},
 			// 跳转商家端
 			toShopClient() {
@@ -74,7 +70,19 @@
 				uni.navigateTo({
 					url: "/pages/bus_pages/index/index"
 				})
-			}
+			},
+			// 加载更多
+			async getLiveList(params) {
+				const result = await this.$apis.getLiveList(params)
+				if(result.code === "000000") {
+					if(result.data.length === 0) {
+						this.status = 'noMore'
+						this.showIcon = false
+						return;
+					}
+					this.liveList = Array.prototype.concat.apply([], result.data)
+				}
+			},
 		},
 		components: {
 			SwiperLive,
@@ -85,20 +93,14 @@
 			uniIcon,
 			NavBar
 		},
-		async onPullDownRefresh() {
-			await this.init()
+		onPullDownRefresh() {
+			this.$apis.debounce(this.init(), 300)
 			uni.stopPullDownRefresh()
 		},
 		onReachBottom() {
-			this.offset +=10 
-			this.$apis.getLiveList({offset: this.offset, limit: this.limit}).then((res) => {
-				if(res.data.length === 0) {
-					this.status = 'noMore'
-					this.showIcon = false
-					return;
-				}
-				this.liveList.concat(result)
-			})
+			this.offset +=10
+			const params = { offset: this.offset, limit: this.limit }
+			this.$apis.debounce(this.getLiveList(params), 300)
 		}
 	}
 </script>

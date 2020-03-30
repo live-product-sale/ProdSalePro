@@ -2,10 +2,6 @@
 	"pages": [{
 			"path":"pages/cus_pages/home/home",
 			"style": {
-				// "navigationBarBackgroundColor":"#ed1c24",
-				// "navigationBarTitleText":"首页",
-				// "navigationBarTextStyle":"white",
-				// "navigationStyle":"default",
 				"navigationStyle":"custom",
 				"enablePullDownRefresh": "true",
 				"app-plus": {
@@ -258,7 +254,7 @@
 							"width":"300px",
 							"height":"200px",
 							"bottom": "65px",
-							"background": "#FFFFFF",
+							"background": "transparent",
 							"zindex":"999"
 						}
 					}]
@@ -309,7 +305,7 @@
 		}, {
 			"path":"pages/cus_pages/address/addressManage",
 			"style": {
-				"navigationBarTitleText":"添加地址"
+				"navigationStyle":"custom"
 			}
 		}, {
 			"path":"pages/cus_pages/order/order",
@@ -335,6 +331,14 @@
 				"navigationBarTitleText":"密码管理"
 			}
 		}
+        ,{
+            "path" : "hybrid/html/404/404",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/cus_pages/order/order-issue",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
@@ -355,22 +359,26 @@
 			"selectedIconPath":"static/tabbarimg/index-active.png",
 			"pagePath":"pages/cus_pages/home/home",
 			"text":"首页"
-		}, {
-			"iconPath":"./static/tabbarimg/attent.png",
-			"selectedIconPath":"static/tabbarimg/attent-active.png",
+		}, 
+		{
+			"iconPath":"static/tabbarimg/2.png",
+			"selectedIconPath":"static/tabbarimg/2-active.png",
 			"pagePath":"pages/cus_pages/attentLive/atttentLive",
 			"text":"关注"
-		}, {
+		}, 
+		{
 			"iconPath":"static/tabbarimg/search.png",
 			"selectedIconPath":"static/tabbarimg/search-active.png",
 			"pagePath":"pages/cus_pages/search/search",
 			"text":"搜索"
-		}, {
+		},
+		{
 			"iconPath":"static/tabbarimg/cat.png",
 			"selectedIconPath":"static/tabbarimg/cat-active.png",
 			"pagePath":"pages/cus_pages/cart/cart",
 			"text":"购物车"
-		}, {
+		}, 
+		{
 			"iconPath":"static/tabbarimg/me.png",
 			"selectedIconPath":"static/tabbarimg/me-active.png",
 			"pagePath":"pages/cus_pages/personalCenter/personalCenter",

@@ -6,7 +6,13 @@
 			...mapMutations(['setLoginState'])
 		},
 		async onLaunch(){
-			console.log('App Launch')
+			/* 页面初始化检测网络状态 */
+			this.$unit.getNetWorkStatus();
+			if (this.networkType == 'none' || this.networkType == 'undefined') {
+				this.$unit.showToast('当前无网络连接,请检查网络');
+			} else if (this.networkType == 'unknown') {
+				this.$unit.showToast('未知的网络类型');
+			}
 			// 更新登陆状态
 			const hasLogin = uni.getStorageSync("hasLogin")
 			if(hasLogin) {

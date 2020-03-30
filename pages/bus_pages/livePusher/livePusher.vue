@@ -24,10 +24,12 @@
 			 * 页面初始化
 			 * */
 			async init() {
+			  this.subscribeMsg(this.live_id)
 			  await this.getLiveById(this.live_id)
 			  this.monitor()
 			  this.getSubView()	
 			  this.getWebView()
+			  
 			},
 			/**
 			 * 创建推流对象
@@ -38,12 +40,13 @@
 					'width': '100%',                                             // 设备宽度
 					'height': '100%',                                            // 设备高度
 					'position': 'static',                                        // 视频布局模式
+					'aspect': '480:960',
 					'top': 0,                                                    // 距离头部0px
 					'left': 0,                                                   // 距设备左边像素
 					'auto-focus': true,                                          // 是否开启自动聚焦
 					'beauty': 1,                                                 // 是否开启美颜
 					'whiteness': this.pushObj.whiteness,                         // 0, 1,2,3,4,5  0 不使用美白， 值越大，美白效果越好
-					'mode': "FHD",                                               // 推流视频模式 ，SD标清， HD高清， FHD 超清
+					'mode': "FHD",                                                 // 推流视频模式 ，SD标清， HD高清， FHD 超清
 					'url': this.pushObj.livepushurl ,                            // 推流地址
 				}
 			    // #ifdef APP-PLUS
@@ -75,7 +78,7 @@
 				const pushHeader = uni.getSubNVueById("header")
 				pushHeader.hide()
 				const pushBarrage = uni.getSubNVueById("barrage")	
-				pushBarrage.hide()
+				pushBarrage.show()
 				const pushFooter = uni.getSubNVueById("footer")
 				pushFooter.show()
 			},
@@ -108,6 +111,7 @@
 			 async startLiveById() {
 				 const data = { live_id: this.live_id, status: true }
 				 const result = await this.$apis.startById(data)
+				 console.log(result)
 				 if(result.code === "000000") {
 					 this.pusher.start(function() {
 						 uni.showToast({
@@ -144,7 +148,24 @@
 					 })
 			  	
 			  	 }
-			 }
+			 },
+			 /**
+			  * @param {String} channel 
+			  * 订阅消息, 接收消息
+			  * **/
+			  subscribeMsg(channel) {
+				 // console.log(channel, "live_id")
+			  	 this.$goEasy.subscribe({
+			  		 channel: channel,
+			  		 onMessage: (message) => {
+			  			// console.log("Channel:" + message.channel + " content:" + message.content);
+						const barrage = uni.getSubNVueById("barrage")
+						barrage.postMessage({
+							msg: message.content
+						})
+			  		 }
+			  	 })
+			  },
 		},
 		onBackPress() {
 			this.endLiveById()

@@ -1,5 +1,13 @@
 <template>
 	<view class="content">
+		<nav-bar 
+		    backgroundColor="#ed1c24" 
+			color="#FFFFFF"
+			leftIcon="back"
+			:title="title" 
+			:isShowRight="showright" 
+			rightIcon="trash" 
+			@click-right="deleteBtn" ></nav-bar>
 		<view class="row b-b">
 			<text class="tit">联系人</text>
 			<input class="input" type="text" v-model="addressData.name" placeholder="收货人姓名" placeholder-class="placeholder" />
@@ -29,10 +37,15 @@
 </template>
 
 <script>
+	import NavBar from '@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue'
 	export default {
 		data() {
 			return {
+				title: "",
+				showright: false,
 				addressData: {
+					id: "",
+					uid: "",
 					name: '',
 					mobile: '',
 					addressName: '在地图选择',
@@ -42,24 +55,30 @@
 				}
 			}
 		},
+		components: {
+			NavBar
+		},
 		onLoad(option){
-			let title = '新增收货地址';
+			this.title = '新增收货地址';
 			if(option.type==='edit'){
-				title = '编辑收货地址'
-				// console.log(JSON.parse(option.data))
+				this.title = '编辑收货地址'
+				this.showright = true
+				// console.log(option.data)
 				this.addressData = JSON.parse(option.data)
 			}
 			this.manageType = option.type;
-			uni.setNavigationBarTitle({
-				title
-			})
 		},
 		methods: {
 			async switchChange(e){
-				const uid = this.$store.state.info.uid
-				const result = await this.$apis.changedefault({uid})
+				const data = {
+					id: this.addressData.id, 
+					uid: this.addressData.uid, 
+					isDefault: e.detail.value,
+				}
+				const result = await this.$apis.changedefault(data)
 				if(result.code === "000000") {
 					this.addressData.isDefault = e.detail.value;
+					this.$apis.prePage().refreshList()
 				}
 			},
 			
@@ -74,38 +93,60 @@
 			},
 			
 			//提交
-			confirm(){
+			async confirm(){
 				let data = this.addressData;
 				if(!data.name){
 					this.$apis.msg('请填写收货人姓名');
 					return;
 				}
-				if(!/(^1[3|4|5|7|8][0-9]{9}$)/.test(data.mobile)){
-					this.$api.msg('请输入正确的手机号码');
+				if(!/(^1[3|4|5|7|8|9][0-9]{9}$)/.test(data.mobile)){
+					this.$apis.msg('请输入正确的手机号码');
 					return;
 				}
 				// if(!data.address){
-				// 	this.$api.msg('请在地图选择所在位置');
+				// 	this.$apis.msg('请在地图选择所在位置');
 				// 	return;
 				// }
 				if(!data.area){
-					this.$api.msg('请填写门牌号信息');
+					this.$apis.msg('请填写门牌号信息');
 					return;
 				}
-				//this.$api.prePage()获取上一页实例，可直接调用上页所有数据和方法，在App.vue定义
 				this.submitAddress()
-				this.$apis.prePage().refreshList(data, this.manageType);
-				setTimeout(()=>{
-					uni.navigateBack()
-				}, 800)
+				this.$apis.prePage().refreshList();
+				uni.navigateBack()
 			},
+			deleteBtn() {
+				uni.showModal({
+					content:"确定删除改地址吗",
+					success: (e) => {
+						if(e.confirm) {
+							this.deleteAddress()
+						} else if(e.cancel) {
+							this.$apis.msg('取消删除')
+						}
+					}
+				})
+			},
+			// 删除该地址
+			async deleteAddress() {
+				const data = { id: this.addressData.id, uid: this.addressData.uid}
+				const result = await this.$apis.deleteAddressById(data)
+				if(result.code === "000000") {
+					this.$apis.msg('删除成功')
+					this.$apis.prePage().refreshList();
+					uni.navigateBack()
+				}
+			},
+			// 提交地址信息
 			async submitAddress() {
 				const action = this.manageType
 				const uid = this.$store.state.info.uid
-				const data = { action, uid, ...this.addressData }
+				const data = { action,...this.addressData, uid }
+				// console.log(data)
 				const result = await this.$apis.updateOrCreate(data) 
 				if(result.code === "000000") {
 					this.$apis.msg(`地址${this.manageType=='edit' ? '修改': '添加'}成功`);
+					this.$apis.prePage().refreshList()
 				}
 			}
 		}
@@ -115,7 +156,7 @@
 <style lang="scss">
 	page{
 		background: $page-color-base;
-		padding-top: 16upx;
+		// padding-top: 16upx;
 	}
 
 	.row{

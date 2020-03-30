@@ -5,6 +5,7 @@
 			 class="uni-input" 
 			 placeholder="请输入手机号" 
 			 maxlength="11"
+			 :disabled="!disableCodeBtn"
 			 type="number"
 			 @blur="checkTel" 
 			 v-model="userInfo.cphone"
@@ -14,14 +15,14 @@
 			<view class="uni-form-item checkinput">
 				<input 
 				  class="uni-input" 
-				  type="number"
+				  type="number" 
 				  placeholder="请输入验证码" 
-				  v-model="userInfo.mobileCode">
+				  v-model="userInfo.mobileCode" />
 			</view>
 			<button 
 			  :class="{ active: disableCodeBtn }" 
 			  :disabled="!disableCodeBtn" 
-			  @tap="sendCode"
+			  @click="sendCode"
 			 >{{ codeBtn.text }}</button>
 		</view>
 		<view class="uni-form-item">
@@ -38,16 +39,16 @@
 			  placeholder="确认密码"
 			  v-model="repassword" />
 		</view>
-		<button type="primary" @click="register">注册</button>
+		<button class="register"  @click="register">注册</button>
 		<view class="links">
 		  已有账号？
-		  <view class="link-highlight" @tap="gotoLogin">点此登陆</view>
+		  <view class="link-highlight" @click="gotoLogin">点此登陆</view>
 		</view>
 	</view>
 </template>
 
 <script type="text/javascript">
-	import md5 from '../../node_modules/js-md5'
+	import md5 from '@/common/js-md5/src/md5.js'
 	
 	export default {
 		data() {
@@ -187,7 +188,7 @@
 </script>
 <style lang="scss">
 	page {
-		background: $color-primary;
+		background: $color-login;
 	}
   .content {
 	  margin-top: 20%;
@@ -237,13 +238,13 @@
 			  border: none;
 		  }
 		  &.active {
-			  background-color: $color-primary;
+			  background: $color-login;
 			  color: $uni-text-color-inverse;
 		  }
 	  }
   }
-  button[type="primary"] {
-  		  background-color: $color-primary;
+  .register {
+  		  background: $color-login;
 		  box-shadow: 0 0 10upx #e3e3e3;
 		  // border-radius: 60upx;
   		  font-size: 34upx;
@@ -260,7 +261,7 @@
 		  margin: 0 10upx;
 	  }
 	  .link-highlight {
-		  color: $color-primary;
+		  color: $color-login;
 	  }
   }
 </style>

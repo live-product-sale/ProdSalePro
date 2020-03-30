@@ -36,7 +36,7 @@
 					<text 
 					  class="specification-val"
 					  :class="{checked: checked.specification == item.specification }"
-					  :key="item.id" 
+					  :key="index" 
 					  @click="check(item, item.specification)">{{item.specification}}</text>
 				</template>
 			</view>
@@ -82,7 +82,7 @@
 			const subNvue = uni.getCurrentSubNVue()
 			subNvue.onMessage(({ data }) => {
 				this.goodsInfo = data.goodInfo.result
-				console.log(this.goodsInfo)
+				// console.log(this.goodsInfo)
 				this.detail = data.goodInfo.detail
 			})
 		},
@@ -93,13 +93,12 @@
 			},
 			// 退出详细页面
 			exit() {
-				uni.$emit('isDetail', {
-					isShowproduct: true,
-					isShowdetail: false 
-				})
+				const isDetail = uni.getSubNVueById("prodDetail")
+				isDetail.hide("slide-out-bottom")
 			},
 			// 加入购物车
 			async addTocart() {
+				console.log(this)
 				if(!this.checked.net_weight || !this.checked.specification) {
 					uni.showToast({
 						title: "请选择好商品格式",
@@ -135,7 +134,8 @@
 					...this.checked, 
 					goods_num:this.goods_num
 				}
-				uni.navigateTo({
+				uni.getCurrentSubNVue().hide("slide-out-bottom")
+				uni.redirectTo({
 					url: '../order/createOrder?data='+JSON.stringify(data)
 				})
 			},

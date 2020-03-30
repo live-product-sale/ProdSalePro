@@ -126,7 +126,7 @@
 		methods: {
 			// 页面初始化
 			async init(data) {	
-				console.log(data)
+				// console.log(data)
 				this.shop_id = data.shop_id
 				this.goods_id = data.goods_id
 				this.goods_num = data.goods_num
@@ -187,6 +187,7 @@
 					   shopInfo, 
 					   goodsInfo  
 					}
+					console.log(data)
 				   const result = await this.$apis.creatOrderList(data)
 				   if(result.code === "000000") {
 					   uni.showToast({ 
@@ -202,7 +203,6 @@
 				   const uid = this.$store.state.info.uid
 				   const result = await this.$apis.getDefaultAddress({uid})
 				   if(result.code === "000000") {
-					   console.log(result.data)
 					   this.addressData = result.data
 				   }
 			   }

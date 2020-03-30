@@ -3,7 +3,8 @@
 </template>
 
 <script>
-	// import IO from '@/common/socket-io/weapp.socket.io.js'
+	
+	
 	export default {
 		data() {
 			return {
@@ -25,40 +26,13 @@
 		},
 		onLoad(data) {
 			// 页面初始化
-			// const socket = IO ("http://192.168.43.118:4000")
-			// socket.on("connect", () => {
-			// 	console.log("successful")
-			// })
-			
 			this.livePlay["live_id"] = data.live_id
 			this.init()
 			// 监听窗体消息
 			this.monitor()
 		},
 		watch: {
-			isShowProduct(newValue, oldValue) {
-				const product = uni.getSubNVueById('liveProduct')
-				if(newValue) {
-					product.show('slide-in-bottom')
-				} else {
-					product.hide('slide-out-bottom')
-				}
-			},
-			isDetail(newValue, oldValue) {
-				const detail = uni.getSubNVueById('prodDetail')
-				if( newValue ) {
-					detail.show('slide-in-bottom')
-				} else {
-					detail.hide('slide-out-bottom')
-				}
-			}
-		},
-		onBackPress(event) {
-			if(this.isShowProduct  || this.isDetail) {
-				this.isDetail = false
-				this.isShowProduct = false
-				return true
-			}
+			
 		},
 		methods: {
 			/*
@@ -69,17 +43,16 @@
 				this.getwebView()
 				this.getSubNvue()
 			 	await this.getGoodSByShop()
+				
 			},
 			/**
 			 * 监听窗体消息
 			 * */
 			 monitor() {
+				 // 接收弹幕
+				 this.subscribeMsg(this.livePlay.live_id)
 				 uni.$on('Product', (data) => {
 				 	this.isShowProduct = data.value
-				 })
-				 uni.$on('isDetail', (data) => {
-				 	this.isDetail = data.isShowdetail
-				 	this.isShowProduct = data.isShowProduct
 				 })
 				 uni.$on("goods_id", (data) => {
 					 this.getGoodsById(data.goods_id)
@@ -93,6 +66,13 @@
 					 const uid = this.$store.state.info.uid
 					 const shop_id = this.livePlay.shop_id
 					 this.increaseCart({uid: uid, shop_id:shop_id, ...data.cartData})
+				 })
+				 // 发送弹幕
+				 uni.$on("barrage", (data) => {
+					 // console.log(data.msg)
+					 const channel = this.livePlay.live_id
+					 const content = { name: this.$store.state.info.userInfo.name, msg: data.msg }
+					 this.publishMsg( JSON.stringify(content), channel)
 				 })
 				 
 			 },
@@ -112,10 +92,9 @@
 			 * 创建播放器，即拉流对象
 			 */
 			plusPlay() {
-				// console.log(this.livePlay.live_play)
 				const styles = {
 					'src': this.livePlay.live_play,                          // 视频地址
-					'top': '100upx',                                         // 播放器距屏幕上方的像素
+					// 'top': '100upx',                                         // 播放器距屏幕上方的像素
 					'width': uni.getSystemInfoSync().windowWidth + 'px',     // 播放器的宽度
 					'height': uni.getSystemInfoSync().windowHeight + 'px',   // 播放器的高度
 					'position': 'static',                                    // 播放器的布局模式
@@ -133,8 +112,8 @@
 				this.player = new plus.video.VideoPlayer('play', styles)
 				// #endif
 				this.currentWebView.append(this.player)
-				this.player.addEventListener('waiting',function() {
-					console.log('视频加载中')
+				this.player.addEventListener('waiting',() => {
+					this.$apis.msg("视频加载中")
 				}, false)
 				this.player.addEventListener('error', function(err) {
 					console.log(JSON.stringify(err))
@@ -184,7 +163,6 @@
 				  const { shop_id } = this.livePlay
 				  const result = await this.$apis.getGoodsByShopId({ shop_id: shop_id })
 				  if(result.code === "000000") {
-					  // console.log(result)
 					  const goods = uni.getSubNVueById('liveProduct')
 					  goods.postMessage({
 						  "productData": result.data
@@ -209,20 +187,47 @@
 			  * @param {Object} data 
 			  * */
 			  async increaseCart(data) {
+				  console.log(data)
 				  const result = await this.$apis.increaseCart(data)
 				  if(result.code === "000000") {
-					uni.showToast({
-						title: '已添加购物车'
-					})
+					this.$apis.msg('添加成功')
+					const detail = uni.getSubNVueById("prodDetail")
+					detail.hide("slide-out-bottom")
 				  }
 			  },
+			  /**
+			   * @param {String} channel 
+			   * 订阅消息, 接收消息
+			   * **/
+			   subscribeMsg(channel) {
+			   	 this.$goEasy.subscribe({
+			   		 channel: channel,
+			   		 onMessage: (message) => {
+			   			// console.log("Channel:" + message.channel + " content:" + message.content);
+						const barrage = uni.getSubNVueById("liveBarrage")
+						barrage.postMessage({
+							msg: message.content
+						})
+			   		 }
+			   	 })
+			   },
+			   /**
+			    * 发布消息
+			    * @param {String} msg 
+			    * @param {String} channel 
+			    * **/
+				publishMsg(msg, channel) {
+					  this.$goEasy.publish({
+						  channel: channel,
+						  message: msg
+					  })
+				 }
 			  
 		},
 		onUnload() {
 			uni.$off('showProduct')
 			uni.$off('barrage')
 			uni.$off('productData')
-			uni.$off('isDetail')
 			uni.$off('goods_id')
 			uni.$off('likeRoom')
 		}

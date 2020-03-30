@@ -22,7 +22,8 @@
 						</text>
 					</view>
 					
-					<view class="zolysoft_navbar_right" 
+					<view class="zolysoft_navbar_right"
+					v-if="isShowRight"
 					@tap="onClickRight" >
 						<view style="margin-right: 5px;font-size: 0.8rem;" >
 							<uni-icons
@@ -94,6 +95,10 @@ export default {
 		rightIconSize: {
 			type: Number,
 			default: 24
+		},
+		isShowRight: {
+			type: Boolean,
+			default: true
 		}
 	},
 	mounted() {
@@ -122,6 +127,7 @@ export default {
 <style>
 	.zolysoft_navbar{
 		width: 100%;
+		z-index: 1000;
 	}
 	.zolysoft_navbar_box{
 		position: relative;

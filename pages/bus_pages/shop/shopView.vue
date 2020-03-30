@@ -8,6 +8,16 @@
 			<input type="text"  v-model="shop_name" />
 			<input type="text"  v-model="goods_avatar" />
 			<input type="text"  v-model="goods_price" />
+			<picker style="height: 100upx; border: 1px solid #000000;" 
+			    mode="selector" 
+			    :range="range"
+				range-key="range[range_id].name"
+				@change="changeRange">
+				<view>{{range[range_id].name}}</view>
+			</picker>
+			<picker mode="selector" range-key="sortRange[sort_id].name" :range="sortRange" :value="sort_id" @change="changeSort">
+				<view>{{sortRange[sort_id].name}}</view>
+			</picker>
 		</view>
 		<button type="primary" @click="sendLive">创建直播间</button>
 		<view class="live">
@@ -28,6 +38,11 @@
 	export default {
 		data() {
 			return {
+				range_id: 0,
+				sort_id: 0,
+				sortRange:[],
+				range: ["品质水果","新鲜蔬菜", "粮油米面", "水产品", "农副加工", "肉禽蛋品", "苗木花草", "其他类型"],
+				sort_name: "苹果",
 				shop_id: '',
 				liveList: [],
 				live_poster: 'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553005139&di=3368549edf9eee769a9bcb3fbbed2504&imgtype=jpg&er=1&src=http%3A%2F%2Fimg002.hc360.cn%2Fy3%2FM01%2F5F%2FDB%2FwKhQh1T7iceEGRdWAAAAADQvqk8733.jpg',
@@ -38,7 +53,10 @@
 				goods_price: "46.66"
 				}
 		},
+		beforeMount() {
+		},
 		onLoad(data) {
+			// console.log(data.shop_id)
 			this.shop_id = data.shop_id
 			this.init()
 		},
@@ -46,6 +64,17 @@
 			// 页面初始化
 			init() {
 				this.getLive()
+				this.getAllRange()
+				this.getAllSortByRangeId()
+			},
+			// 选择直播间的类型
+			changeRange(e) {
+				this.range_id = e.detail.value
+				console.log(this.range[this.range_id].name)
+			},
+			// 选择直播的产品类型
+			changeSort(e) {
+				this.sort_id = e.detail.value
 			},
 			// 创建直播间
 			async sendLive() {
@@ -56,7 +85,9 @@
 					shop_slogan: this.shop_slogan,
 					shop_name: this.shop_name,
 					goods_avatar: this.goods_avatar,
-					goods_price: this.goods_price	
+					goods_price: this.goods_price,
+					range_id: this.range_id,
+					sort_name: this.sort_name
 				}
 				const result = await this.$apis.createLive(data)
 				if(result.code ="000000") {
@@ -68,8 +99,8 @@
 			// 获取直播间信息
 			async getLive() {
 				const result = await this.$apis.getLiveByShop({ shop_id: this.shop_id})
+				console.log(result)
 				this.liveList = result.data
-				// console.log(result)
 			},
 			// 主播进入主播间
 			enterLive(live_id) {
@@ -83,6 +114,21 @@
 				uni.navigateTo({
 					url:"../goods/goods?shop_id="+this.shop_id
 				})
+			},
+			// 获取直播间类型
+			async getAllRange() {
+				const result = await this.$apis.getAllRange()
+				if(result.code === "000000") {
+					this.range = result.data
+				}
+			},
+			// 获取产品类型名称
+			async getAllSortByRangeId() {
+				const result = await this.$apis.getAllSortByRangeId({range_id: this.range_id})
+				if(result.code === "000000") {
+					// console.log(result)
+					this.sortRange = result.data
+				}
 			}
 		}
 	}

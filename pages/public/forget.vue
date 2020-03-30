@@ -5,6 +5,8 @@
 		      <input 
 				 class="uni-input" 
 				 placeholder="请输入手机号" 
+				 :disabled="!disableCodeBtn"
+				 type="number"
 				 @blur="checkTel"
 				 v-model="userInfo.cphone"
 		   	 />
@@ -13,6 +15,7 @@
 		   	<input 
 		   	  type="password" 
 		   	  class="uni-input"
+			  :disabled="!disableCodeBtn"
 		   	  placeholder="请输入新密码"
 		   	  v-model="userInfo.cpassword"
 		   	  />
@@ -21,6 +24,7 @@
 		   	<input 
 		   	  type="password" 
 		   	  class="uni-input"
+			  :disabled="!disableCodeBtn"
 			  placeholder-class="placeholder"
 		   	  placeholder="再次确认密码"
 		   	  v-model="repassword"
@@ -29,7 +33,7 @@
 		  <view class="column-with-btn">
 		  	<view class="uni-form-item checkinput">
 		  		<input 
-		  		  type="text" 
+		  		  type="number" 
 		  		  class="uni-input" 
 		  		  placeholder="请输入验证码" 
 		  		  v-model="userInfo.mobileCode">
@@ -37,20 +41,20 @@
 		  	<button 
 		  	  :class="{ active: disableCodeBtn }" 
 		  	  :disabled="!disableCodeBtn" 
-		  	  @tap="sendCode"
+		  	  @click="sendCode"
 		  	 >{{ codeBtn.text }}</button>
 		  </view>
-		  <button type="primary" @click="modifyPass">提交</button>
+		  <button class="submit" @click="modifyPass">提交</button>
 	   </view>
 	   <view v-if="changSuccess">
 		   <view class="text-reset">重置成功，新密码已生效！</view>
-		   <button type="primary" @tap="gotoLogin">立即登陆</button>
+		   <button class="submit" @click="gotoLogin">立即登陆</button>
 	   </view>
 	</view>
 </template>
 
 <script>
-	import md5 from '../../node_modules/js-md5'
+    import md5 from '@/common/js-md5/src/md5.js'
 	export default {
 		data() {
 			return {
@@ -99,6 +103,7 @@
 				const result = await this.$apis.getMsgCode({
 					cphone: this.userInfo.cphone
 				})
+				// console.log(result)
 				if(result.code === '000000') {
 					uni.showToast({
 						title:'发送成功',
@@ -171,7 +176,7 @@
 
 <style lang="scss">
 	page {
-		background: $color-primary;
+		background: $color-login;
 	}
 	.content {
 		padding:100upx;
@@ -212,13 +217,13 @@
 				border: none;
 			}
 			&.active {
-				background-color: $color-primary;
+				background: $color-login;
 				color: $uni-text-color-inverse;
 			}
 		}
 	}
-	button[type="primary"] {
-		background-color: $color-primary;
+	.submit{
+		background: $color-login;
 		// border-radius: 60upx;
 		font-size: 34upx;
 		margin-top: 60upx;

@@ -1,6 +1,8 @@
 <template>
 	<view class="content">
-		<image @tap="showCategory" class="shoplogo" src="../../../../static/logo/shop.png" mode="aspectFit"></image>
+		<view @click="showCategory">
+			<image class="shoplogo" src="../../../../static/logo/shop.png" mode="aspectFit"></image>
+		</view>
 		<view class="input-box">
 			<input
 			  class="shopinput" 
@@ -31,13 +33,15 @@
 						title: '发送弹幕',
 						icon: 'none'
 					})
-					uni.$emit('barrage', { name: '章三', msg: this.barrage })
+					uni.$emit('barrage', { msg: this.barrage })
 					this.barrage = ''
 				} 
 			},
 			// 点击shopping 展示产品列表
 			showCategory() {
 				uni.$emit('Product', { value: true })
+				const product = uni.getSubNVueById("liveProduct")
+				product.show("slide-in-bottom")
 			}
 		},
 		onUnload() {

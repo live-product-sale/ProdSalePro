@@ -16,15 +16,11 @@
 <script>
 	export default {
 		onLoad() {
-			console.log("ok")
-			const task = uni.connectSocket({
-			  url: 'ws://192.168.43.118:4000/socket',
-			  complete: ()=> {}
-			});
-			console.log(task)
-			
-			uni.$on("barrage", (data) => {
-				this.addDanMu(data.name, data.msg)
+		    const subNvue = uni.getCurrentSubNVue()
+			subNvue.onMessage(({data}) => {
+				// console.log(data.msg)
+				const content = JSON.parse(data.msg)
+				this.addDanMu(content.name, content.msg)
 			})
 		},
 		data() {
@@ -44,9 +40,8 @@
 			  return '#' + rgb.join('')
 			},
 			// 添加弹幕
-			addDanMu(name, message, socket) {
+			addDanMu(name, message) {
 				const id = this.items.length
-				// socket.emit('get barrage from user', { name, message })
 				if(id >= 7) {
 					this.items.pop()
 				}
@@ -56,15 +51,11 @@
 					message
 				})
 			}
-		},
-		
-		onUnload() {
-			uni.$off('barrage')
 		}
 	}
 </script>
 
-<style lang="scss">
+<style>
 	.content {
 		flex-direction: column;
 		padding-top: 5px;

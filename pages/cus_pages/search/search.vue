@@ -126,7 +126,7 @@
 				uni.request({
 					url: 'https://suggest.taobao.com/sug?code=utf-8&q=' + keyword, //仅为示例
 					success: (res) => {
-						console.log(res.data)
+						// console.log(res.data)
 						this.keywordList = this.drawCorrelativeKeyword(res.data.result, keyword);
 					}
 				});
@@ -183,7 +183,7 @@
 				})
 				const result = await this.$apis.search({key: `%${key}`})
 				if(result.code === "000000") {
-					console.log(result)
+					// console.log(result)
 					this.searchResult = result.data
 					if(this.searchResult.length === 0) {
 						this.$apis.msg("搜索结果为空")
@@ -234,10 +234,10 @@
 		width: 100%;
 		height: 30px;
 		border: none;
-		background-color: $color-primary;
+		background: $color-primary;
 	}
 	.search-box {width:95%;border: none;
-	background-color:$color-primary;padding:15upx 2.5%;display:flex;justify-content:space-between;}
+	background:$color-primary;padding:15upx 2.5%;display:flex;justify-content:space-between;}
 	.search-box .mSearch-input-box{width: 100%;}
 	.search-box .input-box {width:85%;flex-shrink:1;display:flex;justify-content:center;align-items:center;}
 	.search-box .search-btn {width:15%;margin:0 0 0 2%;display:flex;justify-content:center;align-items:center;flex-shrink:0;font-size:28upx;color:#fff;background:linear-gradient(to right,#ff9801,#ff570a);border-radius:60upx;}

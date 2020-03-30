@@ -32,7 +32,7 @@
 			<view class="row" :class="{isEdit: !disabled }">
 				<text>性别</text>
 				<picker mode="selector" :disabled="disabled" :value="index" :range="genderRange" @change="changeGender">
-					<text>{{genderRange[index]}}</text>
+					<text>{{genderRange[Number(this.info.userInfo.gender)]}}</text>
 				</picker>
 			</view>
 			<view class="row">
@@ -41,6 +41,7 @@
 			</view>
 			<button class="submit" @click="submit" :disabled="disabled">保存</button>
 		</view>
+		<image-cutter @ok="confirm" @cancel="cancle" :url="url" fixed="false" maxWidth="500" minHeight="300"></image-cutter>
 		<uni-popup ref="popup"  type="bottom">
 			<view class="pic-btn">
 			    <button type="default" @click="takePhoto">拍照选择</button>
@@ -51,9 +52,10 @@
 </template>
 
 <script>
+	import ImageCutter from '@/components/ksp-image-cutter/ksp-image-cutter.vue'
 	import NavBar from '@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue'
 	import uniPopup from '@/components/uni-popup/uni-popup.vue'
-	import upImg  from '@/common/uploadImage.js'
+	import {compressImage} from '@/common/uploadImage.js'
 	import { mapMutations, mapState } from 'vuex'
 	
 	export default {
@@ -61,13 +63,14 @@
 			return {
 				disabled: true,
 				index: 0,
+				url: "",
 				genderRange: ['男', '女']
 			}
 		},
 		computed: mapState(["info"]),
 		onLoad() {
 			this.init()
-			console.log(this.info)
+			// console.log(this.info)
 		},
 		methods: {
 			// 页面初始化
@@ -80,17 +83,44 @@
 			// 选择性别
 			changeGender(e) {
 				this.index = e.detail.value
-				this.info.userInfo["gender"] = this.genderRange[e.detail.value]
+				this.info.userInfo.gender = e.detail.value
+				
+			},
+			// 确认裁剪
+			async confirm(options) {
+				console.log(options)
+				this.url = options.path
+				this.$apis.msg("开始上传")
+				const result = await compressImage(options.path)
+				console.log(result)
+				if(result.statusCode === 200) {
+					this.info.userInfo["avatar"] = result.Location
+					this.cancle()
+					uni.showToast({
+						title: '上传成功'
+					})
+				} else {
+					uni.showToast({
+						title: '上传失败'
+					})
+				}
+			},
+			// 取消裁剪
+			cancle() {
+				this.url = ""
 			},
 			// 提交修改信息
 			async submit() {  
 				this.disabled = true
 				const data = this.info.userInfo
 				const result = await this.$apis.perfectUserInfo(data)
+				console.log(result)
 				if(result.code === "000000") {
+					uni.setStorageSync("Info", this.info)
+					uni.navigateBack()
 					uni.showToast({
 						title: '保存成功'
-					})
+					})		
 				}	
 			},
 			// 换头像
@@ -105,28 +135,9 @@
 					count: 1,
 					sizeType: ['compressed'], 
 					sourceType: ['album'],  
-					success: async (res) => {
-						uni.showLoading({
-							title: "正在上传"
-						})
+					success: (res) => {
 						const filePath = res.tempFiles[0].path;
-						const urlArray = filePath.split("/")
-						const fileName = urlArray[urlArray.length - 1]
-						const result = await upImg(fileName, filePath)
-						console.log(result)
-						if(result.statusCode === 200) {
-							uni.hideLoading()
-							this.info.userInfo["avatar"] = result.Location
-							console.log(this.avatar)
-							uni.showToast({
-								title: '上传成功'
-							})
-						} else {
-							uni.hideLoading()
-							uni.showToast({
-								title: '上传失败'
-							})
-						}
+						this.url = filePath
 					},	
 				})
 			},
@@ -135,28 +146,8 @@
 				const camera = plus.camera.getCamera()
 				const res = camera.supportedImageResolutions[0];
 				const fmt = camera.supportedImageFormats[0];
-				console.log("Resolution: "+res+", Format: "+fmt);
-				camera.captureImage(async (path) => {
-					const urlArray = path.split("/")
-					const fileName = urlArray[urlArray.length - 1]
-					uni.showLoading({
-						title: '开始上传'
-					})
-					const result = await upImg(fileName, path)
-					if(result.statusCode === 200) {
-						console.log(result)
-						this.info.userInfo["avatar"] = result.Location
-						console.log(this.avatar)
-						uni.hideLoading()
-						uni.showToast({
-							title: "上传成功"
-						})
-					} else {
-						uni.hideLoading()
-						uni.showToast({
-							title: "上传失败"
-						})
-					}
+				camera.captureImage((path) => {
+					this.url = path
 				}, (error) => {
 					console.log(error)
 				}, {resolution:res,format:fmt})
@@ -164,7 +155,8 @@
 		},
 		components: {
 			NavBar,
-			uniPopup
+			uniPopup,
+			ImageCutter
 		}
 	}
 </script>

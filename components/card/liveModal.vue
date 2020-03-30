@@ -19,7 +19,7 @@
 				</view>
 			</view>
 			<view class="right">
-				<image :src="goods_avatar" mode="aspectFit" lazy-load="true"></image>
+				<image :src="goods_avatar" mode="aspectFill" lazy-load="true" ></image>
 				<text>¥{{price}}</text>
 			</view>
 		</view>
@@ -152,10 +152,10 @@
 					display: flex;
 					height: 25px;
 					flex-direction: row;
-					align-items: center;
+					align-items: flex-start;
 					image {
-						width: 50upx;
-						height: 50upx;
+						width: 46upx;
+						height: 46upx;
 						border-radius: 50%;
 						margin-right: 5upx;
 					}

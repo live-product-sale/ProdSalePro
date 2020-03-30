@@ -49,18 +49,18 @@
 							件商品 实付款
 							<text class="price">{{getPrice(item.goodsInfo)}}</text>
 						</view>
-						<view class="action-box b-t" v-if="item.order_state == '1'">
+						<view class="action-box b-t" v-if="item.order_state === '1'">
 							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
 							<button class="action-btn recom" @click="toPay(item.order_id)">立即支付</button>
 						</view>
-						<view class="action-box b-t" v-else-if="item.order_state == '2'">
+						<view class="action-box b-t" v-if="item.order_state === '2'">
 							<button class="action-btn recom" @click="confirmOrder(item)">确认收货</button>
 						</view>
-						<view class="action-box b-t" v-else-if="item.order_state == '3'">
+						<view class="action-box b-t" v-if="item.order_state === '3'">
 							<button class="action-btn" @click="deleteOrder(item)">删除订单</button>
-							<button class="action-btn recom">去评价</button>
+							<button class="action-btn recom" @click="appraise(item)">去评价</button>
 						</view>
-						<view class="action-box b-t" v-else-if="item.order.state == '4'">
+						<view class="action-box b-t" v-else-if="item.order_state === '4'">
 							<button class="action-btn" @click="deleteOrder(item)">删除订单</button>
 						</view>
 					</view> 
@@ -166,7 +166,10 @@
 				uni.showLoading({
 					title: '请稍后'
 				})
-			    const data = { order_id: item.order_id, uid: this.$store.state.info.uid}
+			    const data = { 
+					order_id: item.order_id,
+					shop_id: item.shop_id,
+					uid: this.$store.state.info.uid}
 			    const result = await this.$apis.deleteOrder(data)
 			    if(result.code === "000000") {
 			    	uni.hideLoading()
@@ -178,10 +181,15 @@
 			},
 			//取消订单
 			async cancelOrder(item){
+				console.log(item)
 				uni.showLoading({
 					title: '请稍后'
 				})
-				const data = { order_id: item.order_id, uid: this.$store.state.info.uid, order_state: item.order_state}
+				const data = { 
+					order_id: item.order_id,
+					shop_id: item.shop_id,
+					uid: this.$store.state.info.uid, 
+					order_state: item.order_state}
 				const result = await this.$apis.cancelOrder(data)
 				if(result.code === "000000") {
 					uni.hideLoading()
@@ -196,7 +204,11 @@
 				uni.showLoading({
 					title: '请稍后'
 				})
-				const data = { order_id: item.order_id, uid: this.$store.state.info.uid}
+				const data = { 
+					order_id: item.order_id, 
+					uid: this.$store.state.info.uid,
+					shop_id: item.shop_id,
+					}
 				const result = await this.$apis.confirmOrder(data)
 				if(result.code === "000000") {
 					uni.hideLoading()
@@ -205,6 +217,13 @@
 						title: "确认成功"
 					})
 				}
+			},
+			// 订单评价
+			appraise(item) {
+				const order_id = item.order_id
+				uni.navigateTo({
+					url: "./order-issue?order_id="+order_id+"&shop_id="+item.shop_id
+				})
 			},
 			/** 
 			 *  @param {Array} shopInfo 

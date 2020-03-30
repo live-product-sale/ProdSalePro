@@ -34,8 +34,5 @@ export default {
 	},
 	POST(url, data = {}) {
 		return fetch({url, data, method: 'POST'})
-	},
-	POSTformdata(url, data = {}) {
-		return fetch({url, data, method: 'POST'})
 	}
 }

@@ -44,7 +44,7 @@
 			}
 		},
 		onLoad(data) {
-			console.log(data)
+			// console.log(data)
 			this.Title = data.range
 		    this.range_id = data.range_id
 			this.init()
@@ -63,7 +63,7 @@
 			// 滑动屏幕，改变某个类别
 			changeTab(e) {
 				this.tabCurrentIndex = e.detail.current
-				console.log(e.detail.current)
+				// console.log(e.detail.current)
 				this.getLive(this.tabList[this.tabCurrentIndex].id)
 			},
 			// 获取某个范围的类型
@@ -84,7 +84,7 @@
 				}
 				const result = await this.$apis.getLiveByRangeAndSort(data)
 				if(result.code === "000000") {
-					console.log(result)
+					// console.log(result)
 					this.liveList = result.data
 				}
 			},
