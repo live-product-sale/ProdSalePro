@@ -16,9 +16,9 @@
 			class="swiper-box"
 			@change="changeTab">
 				<swiper-item class="item" v-for="(item, index) in tabList" :key="item.id">
-					<scroll-view scroll-y="true" refresher-enabled="true" 	@scrolltolower="loadMoreData">
+					<scroll-view scroll-y>
 						<live-list :liveList="liveList"></live-list>
-						<uni-load-more :status="loadStatus" :showIcon="'true'" :iconType="'circle'"></uni-load-more>
+						<uni-load-more :status="loadStatus" :showIcon="showIcon" iconType="circle"></uni-load-more>
 					</scroll-view>
 				</swiper-item>
 		</swiper>
@@ -26,34 +26,35 @@
 </template>
 
 <script>
-	import NavBar from '@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue'
-	import LiveList from '@/components/livelist/livelist.vue'
-	import WucTab from '@/components/wuc-tab/wuc-tab.vue'
+	import NavBar      from '@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue'
+	import LiveList    from '@/components/livelist/livelist.vue'
+	import WucTab      from '@/components/wuc-tab/wuc-tab.vue'
 	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue'
 	
 	export default {
 		data() {
 			return {
-				  Title: '品质水果',
+				  Title: '',
 				  tabCurrentIndex: 0,
 				  tabList: [],
-				  range_id: 0,
+				  shop_class: "",
 				  sort_id: 0,
 				  liveList: [],
+				  showIcon: true,
 				  loadStatus: "noMore"
 			}
 		},
-		onLoad(data) {
-			// console.log(data)
-			this.Title = data.range
-		    this.range_id = data.range_id
+		onLoad(options) {
+			const data = JSON.parse(options.data)
+			this.Title = data.type
+		    this.shop_class = data.class
 			this.init()
 		},
 		methods: {
 			// 页面初始化
-			init() {
-				this.getRangeTabInfo(this.range_id)
-				this.getLive()
+			async init() {
+	            await this.getRangeTabInfo()
+				await this.getLive()
 			},
 			// 点击某个种类
 			tabChange(index) {
@@ -63,46 +64,35 @@
 			// 滑动屏幕，改变某个类别
 			changeTab(e) {
 				this.tabCurrentIndex = e.detail.current
-				// console.log(e.detail.current)
-				this.getLive(this.tabList[this.tabCurrentIndex].id)
+				console.log(this.tabList[this.tabCurrentIndex])
+				if(this.tabList[this.tabCurrentIndex].goods_id === "000") {
+					this.getLive()
+					return
+				}
+				this.getLive(this.tabList[this.tabCurrentIndex].goods_class)
 			},
 			// 获取某个范围的类型
-			async getRangeTabInfo(id) {
-				const result = await this.$apis.getTabInfo({range_id: id})
-				if(result.code === "000000") {
-					this.tabList = result.data
+			async getRangeTabInfo() {
+				const data = { shop_class: this.Title }
+				const result = await this.$apis.getTabInfo(data)
+				if(result.code === "000000" && result.data) {
+					this.tabList = result.data.goods
+					this.tabList.unshift({goods_class: "全部", goods_id: "000"})
 				}
 			},
 			// 获取某个类别的直播间
-			async getLive(sort_id) {
-				// console.log(sort_id)
-				let data = {}
-				if(!sort_id) {
-					data = { range_id: this.range_id }
-				} else {
-					 data = { range_id: this.range_id, sort_id: sort_id}
-				}
-				const result = await this.$apis.getLiveByRangeAndSort(data)
+			async getLive(goods_class) {
+				const data = { shop_class: this.Title , goods_class}
+				const result = await this.$apis.getLiveByshopClass(data)
 				if(result.code === "000000") {
-					// console.log(result)
 					this.liveList = result.data
 				}
 			},
-			// 加载更多数据
-			async loadMoreData() {
-				let data = {}
-				this.loadStatus = "loading"
-				if(!sort_id) {
-					data = { range_id: this.range_id }
-				} else {
-					 data = { range_id: this.range_id, sort_id: sort_id}
-				}
-				const result = await this.$apis.getLiveByRangeAndSort(data)
-				if(result.code === "000000" && result.data.length!== 0) {
-					this.liveList.concat(result.data)
-				}
-				this.loadStatus = "noMore"
-			}
+			// // 加载更多数据
+			// async loadMoreData() {
+			// 	await this.getLive()
+			// 	this.loadStatus = "noMore"
+			// }
 		},
 		components: {
 			NavBar,

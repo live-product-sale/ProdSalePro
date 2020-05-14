@@ -30,7 +30,7 @@
 		
 		<view class="row default-row">
 			<text class="tit">设为默认</text>
-			<switch :checked="addressData.isDefault" color="#fa436a" @change="switchChange" />
+			<switch :checked="parseInt(addressData.isDefault) === 1" color="#fa436a" @change="switchChange" />
 		</view>
 		<button class="add-btn" @click="confirm">提交</button>
 	</view>
@@ -63,7 +63,6 @@
 			if(option.type==='edit'){
 				this.title = '编辑收货地址'
 				this.showright = true
-				// console.log(option.data)
 				this.addressData = JSON.parse(option.data)
 			}
 			this.manageType = option.type;
@@ -78,7 +77,7 @@
 				const result = await this.$apis.changedefault(data)
 				if(result.code === "000000") {
 					this.addressData.isDefault = e.detail.value;
-					this.$apis.prePage().refreshList()
+					this.$apis.prePage().init()
 				}
 			},
 			
@@ -91,7 +90,6 @@
 					}
 				})
 			},
-			
 			//提交
 			async confirm(){
 				let data = this.addressData;
@@ -111,9 +109,7 @@
 					this.$apis.msg('请填写门牌号信息');
 					return;
 				}
-				this.submitAddress()
-				this.$apis.prePage().refreshList();
-				uni.navigateBack()
+				await this.submitAddress()
 			},
 			deleteBtn() {
 				uni.showModal({
@@ -133,7 +129,7 @@
 				const result = await this.$apis.deleteAddressById(data)
 				if(result.code === "000000") {
 					this.$apis.msg('删除成功')
-					this.$apis.prePage().refreshList();
+					this.$apis.prePage().init();
 					uni.navigateBack()
 				}
 			},
@@ -142,11 +138,11 @@
 				const action = this.manageType
 				const uid = this.$store.state.info.uid
 				const data = { action,...this.addressData, uid }
-				// console.log(data)
 				const result = await this.$apis.updateOrCreate(data) 
 				if(result.code === "000000") {
 					this.$apis.msg(`地址${this.manageType=='edit' ? '修改': '添加'}成功`);
-					this.$apis.prePage().refreshList()
+					this.$apis.prePage().init()
+					uni.navigateBack()
 				}
 			}
 		}

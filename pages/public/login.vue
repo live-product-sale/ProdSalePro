@@ -30,8 +30,8 @@
 			    <image :src="capturl" @click="reloadcheck" class="img-captcha"></image>
 			</view>
 	        <view class="links">
-				<view @click="gotoForgetPassword">忘记密码</view>
-				<view @click="gotoRegister">快速注册</view>
+				<view @click="goForgetPassword">忘记密码</view>
+				<view @click="goRegister">快速注册</view>
 			</view>
 			<button class="login-btn" size="default" @click="login">登陆</button>
 		</view>
@@ -46,7 +46,7 @@
 	export default {
 		data() {
 			return {
-				capturl: config.baseURL+'/user/login/captcha?flag=1',
+				capturl: "",
 				userinfo: {
 					cphone: '',
 					cpassword: '',
@@ -74,10 +74,11 @@
 			 */
 		    async login () {
 				const userinfo = JSON.parse(JSON.stringify(this.userinfo))
-				const result = await this.$apis.postLogin(userinfo)
+				const result = await this.$apis.postLogin(userinfo) 
 				if(result.code === '000000') {
 					// 设置登陆状态
 					this.setLoginState(result.data)
+					this.$apis.msg('登陆成功')
 					uni.reLaunch({
 						url: '/pages/cus_pages/home/home'
 					})
@@ -92,19 +93,25 @@
 		    /**
 			 * 	加载图片
 			 */
-			reloadcheck: function() {
-				this.capturl = config.baseURL+'/user/login/captcha?flag='+Math.random()
+			reloadcheck: async function() {
+				const params = { flag: Math.random() }
+				const result = await this.$apis.getImageCaptcha(params)
+				if(result.code === "000000") {
+					const arrayBuffer = new Uint8Array(result.data.data)
+					const base64 = uni.arrayBufferToBase64(arrayBuffer)
+					this.capturl = 'data:image/png;base64,'+base64
+				}
 			},
 			/**
 			 * 跳转忘记密码页面
 			 */
-			gotoForgetPassword: function() {
+			goForgetPassword: function() {
 				uni.navigateTo({url: 'forget'})
 			},
 			/**
 			 * 跳转注册页面
 			 */
-			gotoRegister: function() {
+			goRegister: function() {
 				uni.navigateTo({url: 'register'})
 			}
 		}

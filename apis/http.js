@@ -16,12 +16,10 @@ function fetch(options) {
 			data: options.data || null,
 			success:(res) => {
 				const result = res.data
-				if(result.code === "000004") {
+				if( result.code === "000004") {
 					msg('您未登陆, 请先登陆')
-				} else if(result.code !== "000000") {
-					msg('错误码:'+result.code)
 				}
-				resolve(result)
+				  resolve(result)
 				},
 			fail: (err) => { reject(err)}
 		})

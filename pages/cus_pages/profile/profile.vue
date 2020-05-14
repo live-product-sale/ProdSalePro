@@ -41,7 +41,7 @@
 			</view>
 			<button class="submit" @click="submit" :disabled="disabled">保存</button>
 		</view>
-		<image-cutter @ok="confirm" @cancel="cancle" :url="url" fixed="false" maxWidth="500" minHeight="300"></image-cutter>
+		<image-cutter @ok="confirm" @cancel="cancle" :url="url" :fixed="Boolean(false)" :maxWidth="parseInt(500)" :minHeight="parseInt(300)"></image-cutter>
 		<uni-popup ref="popup"  type="bottom">
 			<view class="pic-btn">
 			    <button type="default" @click="takePhoto">拍照选择</button>
@@ -52,10 +52,10 @@
 </template>
 
 <script>
-	import ImageCutter from '@/components/ksp-image-cutter/ksp-image-cutter.vue'
-	import NavBar from '@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue'
-	import uniPopup from '@/components/uni-popup/uni-popup.vue'
-	import {compressImage} from '@/common/uploadImage.js'
+	import ImageCutter                from '@/components/ksp-image-cutter/ksp-image-cutter.vue'
+	import NavBar                     from '@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue'
+	import uniPopup                   from '@/components/uni-popup/uni-popup.vue'
+	import {compressImage}            from '@/common/uploadImage.js'
 	import { mapMutations, mapState } from 'vuex'
 	
 	export default {

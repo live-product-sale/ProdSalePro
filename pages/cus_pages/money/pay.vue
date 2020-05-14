@@ -4,11 +4,9 @@
 			<text>支付金额</text>
 			<text class="price">{{totalPrice}}</text>
 		</view>
-
 		<view class="pay-type-list">
-
 			<view class="type-item b-b" @click="changePayType(1)">
-				<text class="icon yticon icon-weixinzhifu"></text>
+				<image src="../../../static/imgs/weixin.png" style="width: 25px;height: 25px; margin-right: 10upx;" mode="aspectFill"></image>
 				<view class="con">
 					<text class="tit">微信支付</text>
 					<text>推荐使用微信支付</text>
@@ -19,7 +17,7 @@
 				</label>
 			</view>
 			<view class="type-item b-b" @click="changePayType(2)">
-				<text class="icon yticon icon-alipay"></text>
+				<image src="../../../static/imgs/zhifubao.png" style="width: 28px;height: 28px;margin-right: 10upx;" mode="aspectFill"></image>
 				<view class="con">
 					<text class="tit">支付宝支付</text>
 				</view>
@@ -28,15 +26,17 @@
 					</radio>
 				</label>
 			</view>
-		</view>
-		
+		</view>	
 		<text class="mix-btn" @click="confirm">确认支付</text>
 	</view>
 </template>
 
 <script>
-
+    import uniIcons from '@/components/uni-icons/uni-icons.vue'
 	export default {
+		components:{
+			uniIcons
+		},
 		data() {
 			return {
 				payType: 1,

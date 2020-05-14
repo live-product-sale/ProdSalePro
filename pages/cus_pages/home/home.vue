@@ -4,18 +4,15 @@
 		    title="首页"
 			color="#FFFFFF"
 			backgroundColor="#ed1c24"
-			rightIcon="videocam"
-			@click-right="toShopClient"
-			rightIconSize="40"
 			></nav-bar>
 		<view class="main-content">
 			<!-- 轮播图展示 -->
-			<swiper-live :speciaLive="speciaLive" />
+			<cuswiper />
 			<!-- 商品分类 -->
 			<category />
 		</view>
 		<view class="title">
-			<image src="../../../static/categoryimg/recommend.png" mode=""></image>
+			<image src="../../../static/category/recommend.png" mode="aspectFill"></image>
 			<text>精品推荐</text>
 		</view>
 		<view class="live-content">
@@ -28,13 +25,13 @@
 </template>
 
 <script>
-	import Category from '@/components/category/category.vue'
-	import SwiperLive from '@/components/swiper/swiper.vue'
-	import LiveList from '@/components/livelist/livelist.vue'
+	import Category    from '@/components/category/category.vue'
+	import Cuswiper      from '@/components/swiper/cus-swiper.vue'
+	import LiveList    from '@/components/livelist/livelist.vue'
 	import SearchVideo from '@/components/searvideo/searvideo.vue'
 	import uniLoadMore from "@/components/uni-load-more/uni-load-more.vue"
-	import uniIcon from "@/components/uni-icons/uni-icons.vue"
-	import NavBar from "@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue"
+	import uniIcon     from "@/components/uni-icons/uni-icons.vue"
+	import NavBar      from "@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue"
 
 	export default {
 		onLoad() {
@@ -43,37 +40,45 @@
 		data() {
 			return {
 				liveList: [],   // 直播列表数据
-				speciaLive: [], // 轮播图数据,
 				offset: 0,      // 偏移量
 				limit: 10,      // 获取数据量
 				status: 'loading',
-				showIcon: true,	
+				showIcon: true,
+				cache: { }, // 缓存数据
 			}
 		},
 		methods: {
 			// 页面初始化
-			async init() {
+			init() {
 				this.status = 'loading'
 				this.showIcon = true
 				this.offset = 0      // 偏移量
 				this.limit = 10      // 获取数据量
-				const specData = await this.$apis.getLiveList({ offset: 0, limit: 3 })
-				if(specData.code === "000000") {
-					this.speciaLive = specData.data
+				const data = { 
+					offset: this.offset, 
+					limit: this.limit, 
+					uid: this.$store.state.info.uid ,
 				}
-				const data = { offset: this.offset, limit: this.limit }
+				if(this.whetherCache(data)) {
+					console.log(this.whetherCache(data))
+					this.liveList = this.cache[`${params.limit}_${params.offset}`]
+					return;
+				}
 				this.getLiveList(data)
 			},
-			// 跳转商家端
-			toShopClient() {
-				this.$apis.msg("进入商家端")
-				uni.navigateTo({
-					url: "/pages/bus_pages/index/index"
-				})
-			},
+			/**
+			 * 判断是否有缓存， 若有 则直接从缓存中取数据 
+			 * @return { Boolean } result
+			 * */
+			whetherCache(params) {
+				let result;
+				this.cache = uni.getStorageSync("cacheData")
+				this.cache[`${params.limit}_${params.offset}`] ? result = true : result = false
+				return result
+			}, 
 			// 加载更多
 			async getLiveList(params) {
-				const result = await this.$apis.getLiveList(params)
+                const result = await this.$apis.getLiveList(params)
 				if(result.code === "000000") {
 					if(result.data.length === 0) {
 						this.status = 'noMore'
@@ -82,10 +87,11 @@
 					}
 					this.liveList = Array.prototype.concat.apply([], result.data)
 				}
+				uni.setStorageSync("cacheData",this.cache)
 			},
 		},
 		components: {
-			SwiperLive,
+			Cuswiper,
 			SearchVideo,
 			LiveList,
 			Category,
@@ -94,14 +100,14 @@
 			NavBar
 		},
 		onPullDownRefresh() {
-			this.$apis.debounce(this.init(), 300)
+			this.$apis.debounce(this.init())
 			uni.stopPullDownRefresh()
 		},
 		onReachBottom() {
 			this.offset +=10
 			const params = { offset: this.offset, limit: this.limit }
-			this.$apis.debounce(this.getLiveList(params), 300)
-		}
+			this.$apis.debounce(this.getLiveList(params))
+		},
 	}
 </script>
 

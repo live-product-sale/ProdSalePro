@@ -7,10 +7,10 @@ export default new GoEasy({
          console.log('连接成功！')
 	 },
 	 onDisconnected: function() {
-		console.log('连接断开！')
+		console.log('连接断开')
 	 },
 	 onConnectFailed: function(error) {
-	    console.log('连接失败或错误！')
+	    console.log('连接失败或错误')
 	 }
 })
 

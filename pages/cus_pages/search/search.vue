@@ -21,7 +21,7 @@
 						<rich-text :nodes="row.htmlStr"></rich-text>
 					</view>
 					<view class="keyword-img" @tap="setkeyword(row)">
-						<image src="/static/HM-search/back.png"></image>
+						<image src="/static/search/back.png"></image>
 					</view>
 				</view>
 			</scroll-view>
@@ -30,7 +30,7 @@
 					<view class="keyword-list-header">
 						<view>历史搜索</view>
 						<view>
-							<image @tap="oldDelete" src="/static/HM-search/delete.png"></image>
+							<image @tap="oldDelete" src="/static/search/delete.png"></image>
 						</view>
 					</view>
 					<view class="keyword">
@@ -41,7 +41,7 @@
 					<view class="keyword-list-header">
 						<view>热门搜索</view>
 						<view>
-							<image @tap="hotToggle" :src="'/static/HM-search/attention'+forbid+'.png'"></image>
+							<image @tap="hotToggle" :src="'/static/search/attention'+forbid+'.png'"></image>
 						</view>
 					</view>
 					<view class="keyword" v-if="forbid==''">
@@ -240,7 +240,7 @@
 	background:$color-primary;padding:15upx 2.5%;display:flex;justify-content:space-between;}
 	.search-box .mSearch-input-box{width: 100%;}
 	.search-box .input-box {width:85%;flex-shrink:1;display:flex;justify-content:center;align-items:center;}
-	.search-box .search-btn {width:15%;margin:0 0 0 2%;display:flex;justify-content:center;align-items:center;flex-shrink:0;font-size:28upx;color:#fff;background:linear-gradient(to right,#ff9801,#ff570a);border-radius:60upx;}
+	.search-box .search-btn {width:15%;margin:0 0 0 2%;display:flex;justify-content:center;align-items:center;flex-shrink:0;font-size:28upx;color:#fff;background:linear-gradient(to left,#ff9801,#ff570a);border-radius:60upx;}
 	.search-box .input-box>input {width:100%;height:60upx;font-size:32upx;border:0;border-radius:60upx;-webkit-appearance:none;-moz-appearance:none;appearance:none;padding:0 3%;margin:0;background-color:#ffffff;}
 	.placeholder-class {color:#9e9e9e;}
 	.search-keyword {width:100%;background-color:rgb(242,242,242);}

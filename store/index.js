@@ -22,6 +22,7 @@ const store  = new Vuex.Store({
 		 * 设置登陆状态
 		 * */
 		setLoginState(state, provider) {
+			// console.log(provider)
 			uni.setStorageSync("token", provider.token)
 			uni.setStorageSync("Info", provider.userinfo)
 			uni.setStorageSync("hasLogin", true)

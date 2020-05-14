@@ -113,11 +113,6 @@
 				"navigationBarTitleText": "个人中心",
 				"navigationBarTextStyle": "white"
 			}
-		}, {
-			"path": "pages/index/index",
-			"style": {
-				"navigationStyle": "custom"
-			}
 		},{
 			"path" : "pages/public/login",
 			"style": {
@@ -186,7 +181,7 @@
 							"position":"absolute",
 							"background": "transparent",
 							"width":"100%",
-							"height":"65px",
+							"height":"400px",
 							"bottom":"0",
 							"zindex": "999"
 						}
@@ -209,85 +204,12 @@
 							"width":"100%",
 							"height":"75%",
 							"bottom":"0",
-							"zindex":"1001"
-							
+							"zindex":"1001"	
 						}
 					}]
 				}
 			}
         },{
-            "path" : "pages/bus_pages/livePusher/livePusher",
-            "style" : {
-				"app-plus": {
-					"titleNView": "false" ,
-					"softinputMode": "adjustPan",
-					"bounce":"none",
-					"animationDuration":"3000",
-					"scrollIndicator":"none",
-					"subNVues": [{
-						"id": "header",
-						"path": "pages/bus_pages/livePusher/subNvue/header",
-						"style": {
-							"position":"absolute",
-							"width":"100%",
-							"height":"65px",
-							"top":"0",
-						    "background": "#FFFFFF",
-							"zindex": "999"
-						}
-					}, {
-						"id":"footer",
-						"path": "pages/bus_pages/livePusher/subNvue/footer",
-						"style" : {
-							"position":"absolute",
-							"width":"100%",
-							"height":"65px",
-							"bottom":"0",
-							"background": "transparent",
-							"zindex": "999"
-						}
-					}, {
-						"id":"barrage",
-						"path": "pages/bus_pages/livePusher/subNvue/barrage",
-						"style": {
-							"position":"absolute",
-							"width":"300px",
-							"height":"200px",
-							"bottom": "65px",
-							"background": "transparent",
-							"zindex":"999"
-						}
-					}]
-				}
-			}
-        }, {
-			"path":"pages/bus_pages/index/index",
-			"style": {
-				"navigationStyle":"custom"
-			}
-		}
-        ,{
-            "path" : "pages/bus_pages/shop/shopModal",
-            "style" : {}
-        },
-		{
-			"path":"pages/bus_pages/shop/shopView",
-			"style":{}
-		}
-        ,{
-            "path" : "pages/bus_pages/live/liveModal",
-            "style" : {}
-        }, {
-			"path":"pages/bus_pages/live/liveView",
-			"style": {}
-		}
-        ,{
-            "path" : "pages/bus_pages/goods/goods",
-            "style" : {}
-        }, {
-			"path":"pages/bus_pages/goods/goods-item",
-			"style": {}
-		}, {
 			"path":"pages/cus_pages/money/pay",
 			"style":{
 				"navigationBarTitleText":"支付方式"
@@ -339,6 +261,30 @@
             "path" : "pages/cus_pages/order/order-issue",
             "style" : {}
         }
+        ,{
+            "path" : "pages/cus_pages/product/product",
+            "style" : {
+				"navigationStyle":"custom"
+			}
+        }
+        ,{
+            "path" : "pages/cus_pages/shop/shop",
+            "style" : {
+				"navigationStyle":"custom"
+			}
+        }
+        ,{
+            "path" : "pages/cus_pages/feedback/feedback",
+            "style" : {
+				"navigationStyle":"custom"
+			}
+        }
+        ,{
+            "path" : "pages/cus_pages/aboutLive/aboutLive",
+            "style" : {
+				"navigationStyle":"custom"
+			}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
@@ -355,32 +301,32 @@
 		"spacing":"4px",
 		"height":"55px",
 		"list":[{
-			"iconPath":"static/tabbarimg/index.png",
-			"selectedIconPath":"static/tabbarimg/index-active.png",
+			"iconPath":"static/tabbar/index.png",
+			"selectedIconPath":"static/tabbar/index-active.png",
 			"pagePath":"pages/cus_pages/home/home",
 			"text":"首页"
 		}, 
 		{
-			"iconPath":"static/tabbarimg/2.png",
-			"selectedIconPath":"static/tabbarimg/2-active.png",
+			"iconPath":"static/tabbar/2.png",
+			"selectedIconPath":"static/tabbar/2-active.png",
 			"pagePath":"pages/cus_pages/attentLive/atttentLive",
 			"text":"关注"
 		}, 
 		{
-			"iconPath":"static/tabbarimg/search.png",
-			"selectedIconPath":"static/tabbarimg/search-active.png",
+			"iconPath":"static/tabbar/search.png",
+			"selectedIconPath":"static/tabbar/search-active.png",
 			"pagePath":"pages/cus_pages/search/search",
 			"text":"搜索"
 		},
 		{
-			"iconPath":"static/tabbarimg/cat.png",
-			"selectedIconPath":"static/tabbarimg/cat-active.png",
+			"iconPath":"static/tabbar/cat.png",
+			"selectedIconPath":"static/tabbar/cat-active.png",
 			"pagePath":"pages/cus_pages/cart/cart",
 			"text":"购物车"
 		}, 
 		{
-			"iconPath":"static/tabbarimg/me.png",
-			"selectedIconPath":"static/tabbarimg/me-active.png",
+			"iconPath":"static/tabbar/me.png",
+			"selectedIconPath":"static/tabbar/me-active.png",
 			"pagePath":"pages/cus_pages/personalCenter/personalCenter",
 			"text":"我的"
 		}]

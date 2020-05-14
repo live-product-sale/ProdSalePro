@@ -1,13 +1,14 @@
 <template>
 	<view class="content">
 		<view class="prod-desc">
-			<image class="img" :src="goodsInfo.goods_avatar" mode="aspectFit"></image>
+			<image class="img" :src="goods.goods_avatar" ></image>
 			<view class="detail-introd">
 				<view class="price">
 					<text style="font-size: 25upx;color: #E45E47;margin-right: 10upx;">¥</text>
-					<text style="font-size: 40upx;color: #E45E47;font-weight: bold;">{{ goodsInfo.goods_price}}</text>
+					<text style="font-size: 40upx;color: #E45E47;font-weight: bold;" v-model="price">{{ price }}</text>
 				</view>
-				<text class="stock">库存{{goodsInfo.goods_stock}}</text>
+				<text class="stock">库存{{goods.goods_stock}}</text>
+				<text class="stock">销量{{goods.goods_sales}}</text>
 				<text class="detail-specification">已选 {{checked.specification}} {{checked.net_weight}}</text>
 			</view>
 			<uni-icon 
@@ -20,11 +21,11 @@
 		<view class="net-weight">
 			<text class="net-title">净含量</text>
 			<view class="container">
-				<template v-for="(item, index) in detail">
+				<template v-for="(item, index) in goods.goodsinfos">
 					<text 
 					  class="net-val" 
 					  :key="item.id" 
-					  :class="{checked: checked.net_weight == item.net_weight}" 
+					  :class="{checked: item.net_weight == checked.net_weight}" 
 					  @click="check(item, item.net_weight)">{{ item.net_weight }}</text>
 				</template>
 			</view>
@@ -32,10 +33,10 @@
 		<view class="specification">
 			<text class="specification-title">规格</text>
 			<view class="container">
-				<template v-for="(item, index) in detail">
+				<template v-for="(item, index) in goods.goodsinfos ">
 					<text 
 					  class="specification-val"
-					  :class="{checked: checked.specification == item.specification }"
+					  :class="{ checked: item.specification == checked.specification}"
 					  :key="index" 
 					  @click="check(item, item.specification)">{{item.specification}}</text>
 				</template>
@@ -47,7 +48,7 @@
 			  class="purchase-val" 
 			  :value="1" 
 			  :min="1" 
-			  :max="parseInt(goodsInfo.goods_stock)"  
+			  :max="parseInt(goods.goods_stock)"  
 			  @change="bindChange" ></uni-number-box>
 		</view>
 		<view class="btn-group">
@@ -72,18 +73,27 @@
 		},
 		data() {
 			return {
-				goodsInfo : {},
+				goods : {},
 				detail: [],
-				checked: {},
-				goods_num: 1
+				checked: {
+					net_weight: "",
+					specification: ""
+				},
+				goods_num: 1,
+				live_id: '',
+				price: 0,
 			}
 		},
-		beforeMount() {
-			const subNvue = uni.getCurrentSubNVue()
-			subNvue.onMessage(({ data }) => {
-				this.goodsInfo = data.goodInfo.result
-				// console.log(this.goodsInfo)
-				this.detail = data.goodInfo.detail
+		onLoad() {
+			uni.$on("goodsItem", (res) => {
+				// console.log(res)
+				this.goods = res.goods
+				this.checked.net_weight = this.goods.goodsinfos[0].net_weight
+				this.checked.specification = this.goods.goodsinfos[0].specification
+				this.price = this.goods.goodsinfos[0].goods_price
+			})
+			uni.$on("live_id", (res) => {
+				this.live_id = res.live_id
 			})
 		},
 		methods: {
@@ -98,7 +108,6 @@
 			},
 			// 加入购物车
 			async addTocart() {
-				console.log(this)
 				if(!this.checked.net_weight || !this.checked.specification) {
 					uni.showToast({
 						title: "请选择好商品格式",
@@ -107,19 +116,21 @@
 					return
 				}
 				const data = this.packageData()
-				const subNvue = uni.getCurrentSubNVue()
-				subNvue.postMessage({
-					"cartData": data
-				})
+				uni.$emit("cartData", data)
 			},
 			//选择商品款式
 			check(obj, value) {
 				const key = Object.entries(obj).filter(item => item[1] === value).map(m => m[0])
 				this.$set(this.checked, key, value)
+				this.goods.goodsinfos.map(item => {
+					if(item.net_weight === this.checked.net_weight && item.specification === this.checked.specification) {
+						this.price = item.goods_price
+					}
+				})
 			},
 			// 直接购买
 			directPurchase() {
-				if(!this.checked.net_weight || !this.checked.specification) {
+				if(!this.checked.net_weight || !this.checked.specification || this.price === 0) {
 					uni.showToast({
 						title: '请选择商品格式'
 					})
@@ -129,8 +140,10 @@
 					title: '创建订单'
 				})
 				const data = {
-					shop_id: this.goodsInfo.shop_id, 
-					goods_id: this.goodsInfo.goods_id,
+					live_id: this.live_id,
+					shop_id: this.goods.shop_id, 
+					goods_id: this.goods.goods_id,
+					goods_price: this.price,
 					...this.checked, 
 					goods_num:this.goods_num
 				}
@@ -145,11 +158,12 @@
 			 * */ 
 			packageData() {
 				const data = {
-					goods_id: this.goodsInfo.goods_id,
-					goods_price: this.goodsInfo.goods_price,
-					goods_name: this.goodsInfo.goods_name,
-					goods_stock: this.goodsInfo.goods_stock,
-					goods_avatar: this.goodsInfo.goods_avatar,
+					goods_id: this.goods.goods_id,
+					shop_id: this.goods.shop_id,
+					goods_price: this.price,
+					goods_name: this.goods.goods_name,
+					goods_stock: this.goods.goods_stock,
+					goods_avatar: this.goods.goods_avatar,
 					...this.checked,
 					goods_num: this.goods_num	
 				}
@@ -226,6 +240,7 @@
 	padding: 12upx 30upx;
 	font-size: 30upx;
 	color: #000000;
+	margin-top: 5upx;
 	text-overflow: ellipsis;
 }
 .checked {
@@ -257,8 +272,8 @@
 	justify-content: center;
 }
 .cart-btn {
-	width: 340upx;
-	height: 90upx;
+	width: 320upx;
+	height: 80upx;
 	border-top-left-radius: 50upx;
 	border-bottom-left-radius: 50upx;
 	border-top-right-radius: 0;
@@ -268,13 +283,13 @@
 	border-width: 0;
 }
 .direct-purchase {
-	width: 340upx;
-	height: 90upx;
+	width: 320upx;
+	height: 80upx;
 	border-top-right-radius: 50upx;
 	border-bottom-right-radius: 50upx;
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
-	background-color:#ed8b6a ;
+	background-color: #ed1c24 ;
 	color: #FFFFFF;
 	border-width: 0;
 }

@@ -30,7 +30,7 @@
 								v-if="rightIcon!=''"
 								:type="rightIcon"
 								:color="color"
-								:size="rightIconSize" />
+								:size="parseInt(rightIconSize)" />
 							<text v-if="rightText!=''">{{rightText}} </text>
 						</view>
 					</view>
@@ -93,7 +93,7 @@ export default {
 		  default: false
 		},
 		rightIconSize: {
-			type: Number,
+			type: Number | String,
 			default: 24
 		},
 		isShowRight: {

@@ -5,10 +5,18 @@
 				<template v-if="status">
 					<view class="status"></view>直播中
 				</template>
-				<template v-else>
-					<view class="status" :style=" {borderColor: '#DDDDDD' }" ></view>直播中
+				<template v-else-if="status">
+					<view class="status" :style=" {borderColor: '#DDDDDD' }" ></view>未上线
 				</template>
 			</view>
+		</view>
+		<view class="view-num">
+			<view class="view-num-pic"></view>
+			<text>{{view_amount}}人在观看</text>
+		</view>
+		<view class="live-follow">
+			<view class="follow"></view>
+			<text>{{att_amount}}</text>
 		</view>
 		<view class="live-info">
 			<view class="left">
@@ -19,8 +27,8 @@
 				</view>
 			</view>
 			<view class="right">
-				<image :src="goods_avatar" mode="aspectFill" lazy-load="true" ></image>
-				<text>¥{{price}}</text>
+				<image alt="商品为空" :src="goods_avatar" mode="aspectFill" lazy-load="true" ></image>
+				<text>¥{{goods_price}}</text>
 			</view>
 		</view>
 	</view>
@@ -31,7 +39,7 @@
 		name: 'UniCard',
 		props: {
 			live_id: {
-				type: String,
+				type: String | Number,
 				default: ''
 			},
 			goods_avatar: {
@@ -54,18 +62,27 @@
 				type: String,
 				default: ''
 			},
-			price: {
-				type: Number,
-				default: 0
+			goods_price: {
+				type: String ,
+				default: ''
 			},
 			shop_avatar:{
 				type: String,
 				default:''
+			},
+			att_amount: {
+				type: String | Number
+			},
+			view_amount: {
+				type: String | Number
 			}
-			
+		},
+		onLoad() {
+			// console.log(this.goods_id)
 		},
 		methods: {
-			onClick(status) {
+			async onClick(status) {
+				// console.log(status, this.live_id)
 				if(!status) {
 					uni.showToast({
 						title: '主播不再线'
@@ -75,6 +92,7 @@
 				uni.showToast({
 			       title: '进入直播间'
 				})
+				await this.$apis.updateViewMount({ live_id: this.live_id, type: 'enter' })
 				uni.navigateTo({
 					url: '/pages/cus_pages/livePlayer/livePlayer?live_id='+this.live_id
 				})
@@ -85,6 +103,7 @@
 
 <style lang="scss" scoped>
 	.live-card {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-start;
@@ -124,6 +143,56 @@
 				}
 			}
 		}
+		.live-follow {
+				position: absolute;
+				display: flex;
+				flex-direction: row;
+				width: 100upx;
+				height: 50upx;
+				right: 5upx;
+				bottom: 80px;
+				padding-right: 3upx;
+				justify-content: flex-end;
+				color: #FFFFFF;
+				.follow {
+					display: block;
+					margin: 0 5upx;
+					width: 50upx;
+					height: 50upx;
+					background-image: url(../../static/imgs/follow.png);
+					background-position: center;
+					background-size: 48upx 48upx;
+					background-repeat: no-repeat;
+				}
+				text {
+					margin-top: 15upx;
+					font-size: 25upx;
+				}
+		}
+		.view-num {
+			position: absolute;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			height: 50upx;
+			color: #FFFFFF;
+			top: 20upx;
+			right: 5upx;
+			.view-num-pic {
+				display: block;
+				margin: 0 3upx;
+				width: 38upx;
+				height: 38upx;
+				background-image: url(../../static/imgs/view_num_pic.png);
+				background-position: center;
+				background-size: 38upx 38upx;
+				background-repeat: no-repeat;
+			}
+			text {
+				line-height: 20upx;
+				font-size: 20upx;
+			}
+		}
 		.live-info {
 			display: flex;
 			flex-direction: row;
@@ -140,9 +209,9 @@
 				justify-content: flex-start;
 				align-items: flex-start;
 				flex: 1;
-				height: 65px;
+				height: 60px;
 				.info {
-					height: 40px;
+					height: 30px;
 					padding: 5upx 10upx;
 					word-wrap: break-word;
 					font-size: 24upx;
@@ -150,12 +219,12 @@
 				}
 				.title {
 					display: flex;
-					height: 25px;
+					// height: 30px;
 					flex-direction: row;
 					align-items: flex-start;
 					image {
-						width: 46upx;
-						height: 46upx;
+						width: 40upx;
+						height: 40upx;
 						border-radius: 50%;
 						margin-right: 5upx;
 					}

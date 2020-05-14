@@ -3,7 +3,7 @@
 		<view class="list b-b" v-for="(item, index) in addressList" :key="index" @click="checkAddress(item)">
 			<view class="wrapper">
 				<view class="address-box">
-					<text v-if="item.isDefault" class="tag">默认</text>
+					<text v-if="parseInt(item.isDefault) === 1" class="tag">默认</text>
 					<text class="address">{{item.addressName}} {{item.area}}</text>
 				</view>
 				<view class="u-box">
@@ -11,14 +11,18 @@
 					<text class="mobile">{{item.mobile}}</text>
 				</view>
 			</view>
-			<text class="yticon icon-bianji" @click.stop="addAddress('edit', item)"></text>
+			<uni-icons type="bars" color="#909399" size="24"  @click="addAddress('edit', item)"/>
 		</view>
 		<button class="add-btn" @click="addAddress('add')">新增地址</button>
 	</view>
 </template>
 
 <script>
+	import uniIcons from '@/components/uni-icons/uni-icons.vue'
 	export default {
+		components: {
+			uniIcons
+		},
 		data() {
 			return {
 				source: 0,
@@ -32,7 +36,7 @@
 		methods: {
 			// 页面初始化
 			init() {
-				
+				this.getAddressData()
 			},
 			//选择地址
 			checkAddress(item){
@@ -55,8 +59,10 @@
 			async getAddressData() {
 				const uid = this.$store.state.info.uid
 				const result = await this.$apis.getAddressData({uid})
-				if(result.code == "000000") {
+				if(result.code == "000000" && result.data) {
 					this.addressList = result.data
+				} else {
+					this.addressList = []
 				}
 			}
 		}

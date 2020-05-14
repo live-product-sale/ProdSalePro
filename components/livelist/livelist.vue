@@ -4,15 +4,17 @@
 			<template v-for="(item ,index) in liveList" >
 				<live-card 
 				  class="item"
-				  :key="item.live_id"
-				  :live_id="item.live_id"
-				  :goods_avatar="item.goods_avatar" 
-				  :status="item.status" 
+				  :key="item.shop_id"
+				  :live_id="item.live.live_id"
+				  :goods_avatar="item.goods[0].goods_avatar" 
+				  :goods_price="item.goods[0].goodsinfos[0].goods_price"
+				  :status="item.live.status" 
 				  :user_name="item.shop_name" 
-				  :introduction="item.shop_slogan"
-				  :live_avatar="item.live_poster"
-				  :price="item.goods_price"
+				  :introduction="item.instructions"
+				  :live_avatar="item.live.live_avatar"
 				  :shop_avatar="item.shop_avatar"
+				  :att_amount="amountFormat(item.live.att_amount)"
+				  :view_amount="amountFormat(item.live.view_amount)"
 				  ></live-card>
 			</template>
 		</view>
@@ -24,17 +26,24 @@
 	
 	export default {
 		name: 'LiveList',
-		props:{
-			liveList: {
-				type: Array,
-				default: []
-			}
-		},
-		onLoad() {
-			// console.log(this.liveList)
-		},
+		props:['liveList'],
 		components: {
 			LiveCard
+		},
+		methods:{
+			/**
+			 * 对数据进行检验
+			 * */
+			amountFormat(amount) {
+				const num = parseInt(amount)
+				if( num < 9999) {
+					return num
+				} else {
+				   const wan = parseInt(num / 10000)
+				   const qian = num % 10000
+				   return qian === 0 ?  `${wan}万` : `${wan}.${ parseInt(qian / 1000)}`
+				} 
+			}
 		}
 	}
 </script>

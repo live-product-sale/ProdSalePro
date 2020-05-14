@@ -12,13 +12,16 @@
 		</view>
 		<list show-scrollbar="false">
 			<cell class="product-item" v-for="(item , index) in product" :key="index">
-				<image class="prod-image" :src="item.goods_avatar" mode="aspectFit"></image>
+				<image class="prod-image" :src="item.goods_avatar" ></image>
 				<view class="prod-info">
-					<text class="prod-desc">{{item.goods_name}}</text>
+					<view @click="navToDetailPage(item)" class="prod-title">
+						<text class="prod-desc">{{item.goods_name}}</text>
+						<text style="color:#E45E47; font-size: 25upx;">查看详情>></text>
+					</view>
 					<view class="price">
-						<text style="color:#E45E47; font-size: 30upx;">¥{{item.goods_price}}</text>
+						<text style="color:#E45E47; font-size: 30upx;">¥{{item.goodsinfos[0].goods_price}}</text>
 						<view class="cart" hover-class="cart-hover"   >
-							<uni-icon type="cart" color="#E45E47" size="20" @click="toDetail(item.goods_id)"></uni-icon>
+							<uni-icon type="cart" color="#E45E47" size="20" @click="toDetail(item)"></uni-icon>
 						</view>
 					</view>
 				</view>
@@ -40,22 +43,29 @@
 			 }
 		},
 		methods:{
-			toDetail(goodsId) {
-				uni.$emit("goods_id", { goods_id: goodsId })
+			// 详情购买窗口
+			toDetail(goodsItem) {
+				uni.$emit("goodsItem", { goods: goodsItem })
 				const product = uni.getSubNVueById("liveProduct")
 				product.hide("slide-out-bottom")
 				const isDetail = uni.getSubNVueById("prodDetail")
 				isDetail.show("slide-in-bottom")
 			},
+			// 退出
 			exit() {
 				const subNvue = uni.getCurrentSubNVue()
 				subNvue.hide("slide-out-bottom")
+			},
+			// 商品详情页
+			navToDetailPage(item) {
+			   uni.navigateTo({
+			   	url: "/pages/cus_pages/product/product?goods_id="+item.goods_id
+			   })
 			}
 		},
 		onLoad() {
-			const subNvue = uni.getCurrentSubNVue()
-			subNvue.onMessage(({data}) => {
-				this.product = data.productData
+			uni.$on("liveGoodsInfo", (res) => {
+				this.product = res
 			})		
 		}
 	}
@@ -105,9 +115,14 @@
 	  height: 200upx;
 	  width: 500upx;
   }
+  .prod-title {
+	  flex-direction: row;
+	  width: 450upx;
+	  justify-content: space-between;
+  }
   .prod-desc {
 	  flex-wrap: wrap;
-	  height: 110upx;
+	  height: 100upx;
 	  text-overflow: ellipsis;
 	  font-size: 28upx;
 	  line-height: 28upx;

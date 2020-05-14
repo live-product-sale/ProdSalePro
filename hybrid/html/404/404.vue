@@ -1,6 +1,6 @@
 <template>
 	<view>
-		404页面
+		404
 	</view>
 </template>
 

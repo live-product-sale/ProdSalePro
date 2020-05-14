@@ -4,8 +4,8 @@
 			<image class="avatar"  :src="liveInfo.shop_avatar" mode="aspectFit" />
 			<text class="userinfo">{{liveInfo.shop_name}}</text>
 			<view class="like" type="primary"  size="mini" @click="likebtn" >
-				<text class="likeword" v-if="liveInfo.isfollow=== false">关注</text>
-				<text class="likeword" v-else-if="liveInfo.isfollow === true">已关注</text>
+				<text class="likeword" v-if="liveInfo.follow_live=== false">关注</text>
+				<text class="likeword" v-else-if="liveInfo.follow_live === true">已关注</text>
 			</view> 
 		</view>
 		<view class="right">
@@ -28,21 +28,29 @@
 					// live_id: '',
 					// shop_avatar: '',
 					// status: false
-				}
+				},
+				cacheHeader: {}
 			}
 		},
 		onLoad() {
-			const liveHead = uni.getCurrentSubNVue()
-			liveHead.onMessage(({data}) => {
-				this.liveInfo = data.liveHeadInfo
+			this.cacheHeader = uni.getStorageSync("cacheHeader")
+			this.liveInfo = this.cacheHeader
+			uni.$on("headerInfo", (res) => {
+				uni.setStorageSync('cacheHeader', res)
+				this.liveInfo = res
 			})
+			
 		},
 		methods:{
 			likebtn() {
-				console.log(this.liveInfo)
-				this.liveInfo.isfollow = !this.liveInfo.isfollow
-				uni.$emit("likeRoom", { data: this.liveInfo })
-				if(this.liveInfo.isfollow) {
+				this.liveInfo.follow_live = !this.liveInfo.follow_live
+				uni.$emit("likeRoom", { 
+					data: { 
+						live_id: this.liveInfo.live_id, 
+						isfollow: this.liveInfo.follow_live,
+						},
+					})
+				if(this.liveInfo.follow_live) {
 					uni.showToast({
 						title: '您已关注该直播间',
 					})
@@ -61,7 +69,7 @@
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
      .content {
 		 flex-direction: row;
 		 height: 80px;

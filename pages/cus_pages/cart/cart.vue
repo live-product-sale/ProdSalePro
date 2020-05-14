@@ -32,7 +32,7 @@
 							></number-box>
 						</view>
 						<view class="operate">
-							<switch :checked="item.goods_checked" @change="changStatus(index)" color="#ed1c24" class="swit"/>
+							<switch :checked="item.goods_checked === '1' " @change="changStatus(index)" color="#ed1c24" class="swit"/>
 							<uni-icon class="del-btn" type="trash" size="24" @click="delItem(index)"></uni-icon>
 						</view>
 					</view>
@@ -56,7 +56,7 @@
 </template>
 <script>
 	import NumberBox from '@/components/uni-number-box/uni-number-box.vue'
-	import uniIcon from '@/components/uni-icons/uni-icons.vue'
+	import uniIcon   from '@/components/uni-icons/uni-icons.vue'
 	
 	export default {
 		components: {
@@ -85,7 +85,7 @@
 		alltotal() {
 			let sum = 0
 			this.cartList.forEach((item) => {
-				if(item.goods_checked) {
+				if(item.goods_checked === "1") {
 					sum += item.goods_price * item.goods_num
 				}
 			})
@@ -93,7 +93,7 @@
 		},
 		orderList() {
 			return this.cartList.filter(item => {
-				return item.goods_checked === true 
+				return item.goods_checked === "1" 
 			})
 		}
 	},
@@ -114,17 +114,15 @@
 		},
 		// 改变商品的状态
 		async changStatus(index) {
-			console.log(index)
 			const cart_id = this.cartList[index].cart_id
-			const status = !this.cartList[index].goods_checked
+			const status = this.cartList[index].goods_checked === "1" ? "0" : "1"
 			const result = await this.$apis.changeCartStatus({cart_id: cart_id, status: status})
 			if(result.code === "000000") {
-				this.cartList[index].goods_checked = !this.cartList[index].goods_checked
+				this.cartList[index].goods_checked = status
 			}
 		},
 		// 删除购物车中的产品
 		 delItem(index) {
-			console.log(this.cartList[index])
 		    uni.showModal({
 		    	content:"确认删除吗",
 				success: async (res) => {
@@ -147,12 +145,12 @@
 		changAll() {
 			if(!this.allChecked) {
 				this.cartList.forEach(item => {
-					item.goods_checked = true
+					item.goods_checked = "1"
 				})
 			}
 			else {
 				this.cartList.forEach(item => {
-					item.goods_checked = false
+					item.goods_checked = "0"
 				})
 			}
 			this.allChecked = !this.allChecked
@@ -164,14 +162,11 @@
 					content:'确定清空购物车吗',
 					success:(res) => {
 						if(res.confirm) {
-							console.log("ok")
 							this.deleteCartDataAll()
 						}
 						else if(res.cancel) {
 							this.$apis.msg("取消清空")
 						}
-					},
-					fail(){
 					}
 				})
 			}
@@ -190,11 +185,17 @@
 		// 获取所有购物车数据
 		async getCart() {
 			const uid = this.$store.state.info.uid
-			const result = await this.$apis.getCartList({ uid})
-			this.cartList = result.data
+			const result = await this.$apis.getCartList({uid})
+			// console.log(result)
+			if(result.code === "000000" && result.data) {
+				this.cartList = result.data
+			} else {
+				this.cartList = []
+			}
 		},
 		// 计算结账
 		createOrder(){ 
+			// console.log(this.orderList)
 			if(this.orderList.length !== 0) {
 				uni.showToast({
 					title: '跳转结账页面'
@@ -202,8 +203,8 @@
 				const uid = this.$store.state.info.uid
 				uni.navigateTo({
 					url: '/pages/cus_pages/order/createOrder?uid='+uid,
-					success(){
-						console.log('跳转创建订单页面')
+					success: ()=>{
+						this.$apis.msg('跳转创建订单页面')
 					}
 		       })
 			} else {
@@ -216,7 +217,7 @@
 	},
 	// 下拉刷新
 	async onPullDownRefresh() {
-		await this.init()
+		await this.$apis.debounce(this.init)
 		uni.stopPullDownRefresh();
 	}
 }

@@ -33,6 +33,10 @@
 				<image :src="item.icon" mode="aspectFill"></image>
 				<text>{{item.name}}</text>
 			</view>
+			<view class="menu_item"  @click="checkUpdate">
+				<image :src="checkVersion.icon" mode="aspectFill"></image>
+				<text>{{checkVersion.name}}</text>
+			</view>
 		</view>
 		<!-- loginout  -->
 		<view class="login-out">
@@ -50,81 +54,72 @@
 						key: 1,
 						name: '待付款',
 						to_page: '../order/order?state=1',
-						url: '../../../static/fumou-center-template/one.png'
+						url: '../../../static/center/one.png'
 					},
 					{
 						key: 2,
 						name: '待收货',
 						to_page: '../order/order?state=2',
-						url: '../../../static/fumou-center-template/2.png'
+						url: '../../../static/center/2.png'
 					},
 					{
 						key: 3,
 						name: '待评价',
 						to_page: '../order/order?state=3',
-						url: '../../../static/fumou-center-template/3.png'
+						url: '../../../static/center/3.png'
 					},
 					{
 						key: 4,
 						name: '全部订单',
 						to_page: '../order/order?state=0',
-						url: '../../../static/fumou-center-template/4.png'
+						url: '../../../static/center/4.png'
 					}
 				],
 				menus: [{
 					    name: "密码管理",
-						icon:'../../../static/fumou-center-template/1.png',
+						icon:'../../../static/center/1.png',
 						url: "../profile/passManage",
 						key: 0
 				    },
 					{
 						name: '信息管理',
-						icon: '../../../static/fumou-center-template/5.png',
+						icon: '../../../static/center/5.png',
 						url: '../profile/profile',
 						key: 1,
 					},
 					{
 						name: '地址管理',
-						icon: '../../../static/fumou-center-template/6.png',
+						icon: '../../../static/center/6.png',
 						url: '../address/address',
 						key: 2,
 					},
 					{
-						name: '帮助中心',
-						icon: '../../../static/fumou-center-template/8.png',
-						key: 4,
-					},
-					{
 						name: '意见反馈',
-						icon: '../../../static/fumou-center-template/9.png',
+						icon: '../../../static/center/9.png',
+						url: "../feedback/feedback",
 						key: 5,
 					},
 					{
 						name: '关于我们',
-						icon: '../../../static/fumou-center-template/10.png',
+						icon: '../../../static/center/10.png',
+						url: "../aboutLive/aboutLive",
 						key: 6,
-					},
-					{
-						name: '检查更新',
-						icon: '../../../static/fumou-center-template/10.png',
-						key: 7,
 					}
-				
-				]
+				],
+				checkVersion: {
+					name: '检查更新',
+					icon: '../../../static/center/10.png',
+				}
 			};
 		},
 		onLoad() {
-			this.init()
+			// this.init()
 		},
 		computed: mapState({
 			userInfo: state => state.info.userInfo
 		}),
 		methods: {
 			...mapMutations(["setLogoutState"]),
-			// 页面初始化
-			init() { 
-				// console.log(this.userInfo)
-			},
 		    //退出登录
 		    toLogout(){
 		    	uni.showModal({
@@ -143,13 +138,21 @@
 		    },
 			// 跳转目标页面
 			navToPage(url, name) {
-				uni.showToast({
-					title: name
-				})
+				this.$apis.msg(name)
 				uni.navigateTo({
 					url: url
 				})
 			},
+			// 检查软件是否更新
+			async checkUpdate() {
+				uni.showLoading({
+					title: '正在检查'
+				})
+				setTimeout(() => {
+					uni.hideLoading()
+					this.$apis.msg('当前已是最新版本')
+				}, 1000)
+			}
 		}
 	}
 </script>
@@ -232,7 +235,6 @@
 				align-items: center;
 				position: relative;
 				border-bottom: 1px solid #EFEFEF;
-	
 				&:hover {
 					background: #F6F6F6 !important;
 				}
@@ -243,21 +245,18 @@
 					height: 30upx;
 					position: absolute;
 					right: 5%;
-					background: url('../../../static/fumou-center-template/right.png') no-repeat;
+					background: url('../../../static/center/right.png') no-repeat;
 					background-size: 100%;
 				}
-	
+	            &:nth-of-type(1) {
+					border-top: 1px solid #EFEFEF;
+				}
 				text:nth-of-type(1) {
 					margin-left: 10px;
 				}
-	
 				image {
 					width: 40upx;
 					height: 40upx;
-				}
-	
-				&:nth-of-type(4) {
-					margin-top: 10px;
 				}
 			}
 		}

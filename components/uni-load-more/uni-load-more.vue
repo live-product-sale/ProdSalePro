@@ -57,7 +57,7 @@
 				default: 'more'
 			},
 			showIcon: {
-				type: Boolean,
+				type: Boolean | String,
 				default: true
 			},
 			iconType: {

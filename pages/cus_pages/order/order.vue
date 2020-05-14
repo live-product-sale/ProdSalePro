@@ -32,9 +32,11 @@
 						</view>
 						
 						<view class="goods-box">
-							<view
-								v-for="(goodsItem, goodsIndex) in item.goodsInfo" :key="goodsIndex"
-								class="goods-item">
+							<view 
+							    class="goods-item"
+							    v-for="(goodsItem, goodsIndex) in item.goodsInfo" 
+							    :key="goodsIndex"	
+							>
 								<image class="goods-img" :src="goodsItem.goods_avatar" mode="aspectFill"></image>
 								<view class="right">
 									<view class="title">{{goodsItem.goods_name}}</view>
@@ -125,21 +127,35 @@
 		},
 		 
 		methods: {
+			async getOrderByState(data) {
+				const result = await this.$apis.getOrderList(data)
+				if(result.code === "000000" && result.data) {
+					let orderList = this.dealData(result.data.orderList, result.data.orderGoods)
+					// console.log(result.data.orderList, result.data.orderGoods)
+					this.navList[this.tabCurrentIndex].orderList = orderList
+				} else {
+					// return []
+					this.navList[this.tabCurrentIndex].orderList = []
+				}
+			},
 			//获取订单列表
 			async loadData(source){
 				//这里是将订单挂载到tab列表下
 				let index = this.tabCurrentIndex;
 				let navItem = this.navList[index];
+				navItem.loadingType = "loading"
 				let state = navItem.state;
-				const data = { order_state: this.tabCurrentIndex, uid: this.$store.state.info.uid, offset: this.offset, limit: this.limit}
-				const result = await this.$apis.getOrderList(data)
-				if(result.code === "000000") {
-					this.navList[index].orderList = this.dealData(result.data.orderList, result.data.orderGoods)
-					if(this.navList[index].orderList.length === 0) {
-						console.log(this.navList[index].orderList)
-						navItem.loadingType = "noMore"
-						return;
-					}
+				const data = { 
+					order_state: this.tabCurrentIndex, 
+					uid: this.$store.state.info.uid, 
+					offset: this.offset, 
+					limit: this.limit,
+				}
+				await this.getOrderByState(data)
+				if(this.navList[index].orderList.length === 0) {
+					console.log(this.navList[index].orderList)
+					navItem.loadingType = "noMore"
+					return;
 				}
 				if(source === 'tabChange' && navItem.loaded === true){
 					return;
@@ -148,7 +164,7 @@
 					//防止重复加载
 					return;
 				}
-				navItem.loadingType = 'loading';
+				navItem.loadingType = 'noMore';
 			
 			}, 
 
@@ -220,9 +236,15 @@
 			},
 			// 订单评价
 			appraise(item) {
+				console.log(item)
 				const order_id = item.order_id
 				uni.navigateTo({
-					url: "./order-issue?order_id="+order_id+"&shop_id="+item.shop_id
+					url: "/pages/cus_pages/order/order-issue?"+
+					       "order_id="+item.order_id+
+						   "&shop_id="+item.shop_id+
+						   "&goods_id="+item.goodsInfo[0].goods_id+
+						   "&net_weight="+item.goodsInfo[0].net_weight+
+						   "&specification="+item.goodsInfo[0].specification
 				})
 			},
 			/** 
@@ -234,7 +256,7 @@
 				shopInfo.forEach(item => item["goodsInfo"] = [])
 				shopInfo.forEach(item => {
 					goodsInfo.forEach(iitem => {
-						if(item.shop_id === iitem.shop_id && item.order_id === iitem.order_id) {
+						if(iitem.order_id === iitem.order_id && iitem.shop_id === iitem.shop_id) {
 							item["goodsInfo"].push(iitem)
 						}
 					})
@@ -258,6 +280,10 @@
 			   	url: '../money/pay?order_id='+id
 			   })
 		   }
+		},
+		onReachBottom() {
+			this.offset +=10
+			this.$apis.debounce(this.loadData())
 		},
 	}
 </script>

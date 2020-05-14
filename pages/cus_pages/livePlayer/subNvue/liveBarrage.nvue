@@ -16,11 +16,15 @@
 <script>
 	export default {
 		onLoad() {
-		    const subNvue = uni.getCurrentSubNVue()
-			subNvue.onMessage(({data}) => {
-				// console.log(data.msg)
+			uni.$on('danmu', (data) => {
 				const content = JSON.parse(data.msg)
-				this.addDanMu(content.name, content.msg)
+				this.items.push({
+					name: content.name, 
+					message: content.msg,
+				})
+				if(this.items.length > 6) {
+					this.items.shift()
+				}
 			})
 		},
 		data() {
@@ -39,18 +43,6 @@
 			  }
 			  return '#' + rgb.join('')
 			},
-			// 添加弹幕
-			addDanMu(name, message) {
-				const id = this.items.length
-				if(id >= 7) {
-					this.items.pop()
-				}
-				this.items.push({
-					id: id + 1,
-					name,
-					message
-				})
-			}
 		}
 	}
 </script>

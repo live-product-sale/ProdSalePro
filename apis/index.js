@@ -8,7 +8,7 @@ export const updateLogin = (data) => http.POST('/user/updateLogin', data)
 // 用户注册
 export const postRegister = (data) => http.POST('/user/register', data)
 // 获取验证码图片
-// export const getImageCaptcha = (data) => http.GET('/user/login/captcha', data)
+export const getImageCaptcha = (data) => http.GET('/user/login/captcha', data)
 // 获取短信验证码
 export const getMsgCode = (data) => http.GET('/user/register/sendMsg', data)
 // 找回密码
@@ -20,6 +20,8 @@ export const getUserInfo = (data) => http.GET('/user/userInfo', data)
 // 提交用户信息
 export const perfectUserInfo =(data) => http.POST('/user/perfect', data)
 export const getUserName = (data) => http.GET('/user/username', data)
+// 意见反馈
+export const submitAdvices = (data) => http.POST('/user/advice', data)
 
 /****************************直播室模块*********************** *******/
 // 创建直播室
@@ -41,7 +43,12 @@ export const attentionLive = (data) => http.POST('/live/attention', data)
 // 获取关注直播间
 export const getLikelive = (data) => http.GET('/live/attentionList', data)
 // 根据sort_id, range_id 获取直播间
-export const getLiveByRangeAndSort = (data) => http.GET('/live/sortAndrange', data)
+export const getLiveByshopClass = (data) => http.GET('/live/shopclass', data)
+/**
+ * 更新直播间观众人数
+ * data: { live_id: string, type: 'enter' | 'out' }
+ * */
+export const updateViewMount = (data) => http.POST('/live/view', data)
 
 /*****************************购物车模块******************************/
 export const getCartList = (data) => http.GET('/cart/cartList', data)
@@ -66,9 +73,9 @@ export const getShopInfobyShopId = (data) => http.GET('/shop/shopInfo', data)
 // 根据shop_id获取商品信息
 export const getGoodsByShopId = (data) => http.GET('/goods/goodsbyshop', data)
 // 根据shop_id创建商品
-export const createGoods = (data) => http.POST('/goods/creategoods', data)
+// export const createGoods = (data) => http.POST('/goods/creategoods', data)
 // 根据商品id 完善商品信息
-export const perfectGoods = (data) => http.POST('/goods/goodsInfo', data)
+// export const perfectGoods = (data) => http.POST('/goods/goodsInfo', data)
 // 根据商品id 获取商品详情
 export const getGoodsByGoodsId = (data) => http.GET('/goods/goodsInfo', data)
 export const getGoodsById = (data) => http.GET('/goods/goodsSimpleinfo', data)
@@ -92,7 +99,10 @@ export const deleteOrder = (data) => http.POST('/order/deleteOrder', data)
 export const confirmOrder = (data) => http.POST('/order/confirmOrder', data)
 // 订单评论
 export const finishAssess = (data) => http.POST('/order/assess', data)
+/***************************评论模块************************************/
 
+// 根据商品ID获取评论内容
+export const getCommentByGoodsId = (data) => http.GET('/comment/content', data)
 /***************************地址管理模块 ********************************/
 export const getAddressData = (data) => http.GET('/address/addressList', data)
 // 更新或创建地址
@@ -106,11 +116,14 @@ export const deleteAddressById = (data) => http.POST('/address/deletebyid', data
 
 /*****************************直播分类模块**********************************/
 // 获取某个范围的类型
-export const getTabInfo = (data) => http.GET('/sort/range_id', data)
-export const getAllRange = (data) => http.GET('/sort/range', data)
-export const getAllSortByRangeId = (data) => http.GET('/sort/sortByrangeId', data)
+export const getTabInfo = (data) => http.GET('/shop/goodsclass', data)
+// export const getAllRange = (data) => http.GET('/sort/range', data)
+// export const getAllSortByRangeId = (data) => http.GET('/sort/sortByrangeId', data)
 /*****************************搜索模块**************************************/
 export const search = data => http.GET('/search/key', data)
+/******************************埋点*******************************/
+export const enterLive = data => http.POST('/live/buried/enter', data)
+export const outLive = data => http.POST('/live/buried/out', data)
 
 
 // 获取上一页实例
@@ -134,7 +147,7 @@ export const msg = (title, duration=1500, mask=false, icon='none')=>{
 		icon
 	});
 }
-export function debounce(fn, interval = 400) {
+export function debounce(fn, interval = 600) {
 	let timeout = null
 	return function() {
 		clearTimeout(timeout)
