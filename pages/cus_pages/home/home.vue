@@ -34,7 +34,7 @@
 	import NavBar      from "@/components/zolysoft-nav-bar/zolysoft-nav-bar.vue"
 
 	export default {
-		onLoad() {
+		mounted() {
 			this.init()
 		},
 		data() {
@@ -60,7 +60,7 @@
 					uid: this.$store.state.info.uid ,
 				}
 				if(this.whetherCache(data)) {
-					console.log(this.whetherCache(data))
+					// console.log(this.whetherCache(data))
 					this.liveList = this.cache[`${params.limit}_${params.offset}`]
 					return;
 				}
@@ -85,6 +85,7 @@
 						this.showIcon = false
 						return;
 					}
+					// console.log(result.data)
 					this.liveList = Array.prototype.concat.apply([], result.data)
 				}
 				uni.setStorageSync("cacheData",this.cache)

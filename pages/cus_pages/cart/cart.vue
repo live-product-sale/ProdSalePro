@@ -71,7 +71,9 @@
 			} else {
 				uni.hideLoading()
 			}
-			this.getCart()
+		},
+		mounted() {
+			this.init()
 		},
 		data() {
 			return {
@@ -107,7 +109,8 @@
 			this.cartList[index].goods_num = value
 			const goods_num = value
 			const cart_id = this.cartList[index].cart_id
-			const result = await this.$apis.changCartNum({ cart_id: cart_id, goods_num: goods_num })
+			const data = { cart_id: cart_id, goods_num: goods_num }
+			const result = await this.$apis.changCartNum(data)
 			if(result.code === "000000") {
 				this.cartList[index].goods_num = value
 			}
@@ -123,23 +126,18 @@
 		},
 		// 删除购物车中的产品
 		 delItem(index) {
-		    uni.showModal({
-		    	content:"确认删除吗",
-				success: async (res) => {
-					if(res.confirm) {
-						const data = { cart_id: this.cartList[index].cart_id, uid: this.cartList[index].uid }
-						const result = await this.$apis.deleteByLiveid(data)
-						if(result.code === "000000") {
-							this.init()
-							uni.showToast({ title: "删除成功"})
-						}
-					}  else if(res.cancel) {
-						uni.showToast({
-							title: "取消删除"
-						})
-					}
-				}
-		    })
+		  this.$apis.modal("确认删除吗", async (res) => {
+			  if(res.confirm) {
+			  		const data = { cart_id: this.cartList[index].cart_id, uid: this.cartList[index].uid }
+			  		const result = await this.$apis.deleteByLiveid(data)
+			  		if(result.code === "000000") {
+			  			this.init()
+			  			this.$apis.msg("删除成功")
+			  		}
+			  	}  else if(res.cancel) {
+			  		this.$apis.msg("取消删除")
+			  }
+		  })
 		},
 		// 全选操作
 		changAll() {
@@ -158,15 +156,12 @@
 		// 清空购物车
 		clearCart() {
 			if(this.allChecked) {
-				uni.showModal({
-					content:'确定清空购物车吗',
-					success:(res) => {
-						if(res.confirm) {
-							this.deleteCartDataAll()
-						}
-						else if(res.cancel) {
-							this.$apis.msg("取消清空")
-						}
+				this.$apis.modal("确定清空购物车吗", (res) => {
+					if(res.confirm) {
+						this.deleteCartDataAll()
+					}
+					else if(res.cancel) {
+						this.$apis.msg("取消清空")
 					}
 				})
 			}
@@ -186,7 +181,6 @@
 		async getCart() {
 			const uid = this.$store.state.info.uid
 			const result = await this.$apis.getCartList({uid})
-			// console.log(result)
 			if(result.code === "000000" && result.data) {
 				this.cartList = result.data
 			} else {
@@ -197,9 +191,7 @@
 		createOrder(){ 
 			// console.log(this.orderList)
 			if(this.orderList.length !== 0) {
-				uni.showToast({
-					title: '跳转结账页面'
-				}); 
+				this.$apis.msg('跳转结账页面')
 				const uid = this.$store.state.info.uid
 				uni.navigateTo({
 					url: '/pages/cus_pages/order/createOrder?uid='+uid,
@@ -208,16 +200,13 @@
 					}
 		       })
 			} else {
-				uni.showToast({
-					title: '请选购商品',
-					icon: "none"
-				})
+				this.$apis.msg('请选购商品')
 			}
 		}
 	},
 	// 下拉刷新
 	async onPullDownRefresh() {
-		await this.$apis.debounce(this.init)
+		await this.$apis.debounce(this.init())
 		uni.stopPullDownRefresh();
 	}
 }

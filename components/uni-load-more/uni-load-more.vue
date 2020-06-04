@@ -112,7 +112,7 @@
 		},
 		methods: {
 			onClick() {
-				console.log(this.status)
+				// console.log(this.status)
 				this.$emit('clickLoadMore', {
 					detail: {
 						status: this.status,

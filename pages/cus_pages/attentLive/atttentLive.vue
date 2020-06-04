@@ -18,7 +18,7 @@
 		components: {
 			LiveList
 		},
-		onLoad () {
+		mounted() {
 			this.init()
 		},
 		data() {

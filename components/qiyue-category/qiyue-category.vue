@@ -19,7 +19,7 @@
 							<text class="item-sales">销量:{{item.goods_sales}}</text>
 							<text class="item-views">浏览量:{{item.goods_views}}</text>
 							<view class="item-buy">
-								<text class="item-price">¥{{item.goods_price}}</text>
+								<text class="item-price">¥{{item.goods_infos && item.goods_infos[0].goods_price }}</text>
 							    <navigator :url="'/pages/cus_pages/product/product?goods_id='+item.goods_id" open-type="redirect">
 									<text style="color: #ed1c24; font-size: 25upx;">去购买>></text>
 								</navigator>

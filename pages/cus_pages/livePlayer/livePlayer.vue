@@ -1,9 +1,8 @@
 <template>
-	<view></view>
+	<view id="play"></view>
 </template>
 
 <script>
-	import IO from '../../../common/socket.io-client/lib/socket.js'
 	
 	export default {
 		data() {
@@ -16,80 +15,64 @@
 					live_id: '',         // 直播间ID	
 					live_url: '',        // 直播地址
 					live_avatar: '',     // 拉流图片
-					isfollow: '',        // 关注人数
-					shop: {
-						shop_id: "",
-						shop_name: "",
-						shop_avatar: ""
-					}
+					shop: {},
+					isfollow: false
 				}
 			}
 		},
 		onLoad(data) {
+			this.livePlay.live_id = data.live_id
+			console.log(data)
 			// 页面初始化
-			this.livePlay["live_id"] = data.live_id
-			// 监听窗体消息
 			this.monitor()
+			// 监听窗体消息
+			// this.init()
 		},
 		mounted() {
 			this.init()
-			this.enterLive()
 		},
 		methods: {
+			async getLivePlay() {
+				const result = await this.$apis.getLivePlay({live_id: String(this.livePlay.live_id)})
+				if(result.code === "000000" && result.data) {
+					const data  = { ...result.data }
+					this.livePlay.live_url = data.live_url
+					this.livePlay.live_avatar = data.live_avatar
+					this.livePlay.isfollow = data.isfollow
+					console.log(data.shop_id)
+					uni.$emit("shop_id", data)
+					uni.$emit('head', data)
+				}
+			},
 			/*
 			 *  页面初始化
 			 */
 			async init() {
-				await this.getLivePlayInfo()
+				await this.getLivePlay()
 				this.getwebView()
 				this.getSubNvue()
-				await this.getGoodSByShop()
-				const data = {
-					uid: this.$store.state.info.uid,
-					enter_time: parseInt(Date.now() / 1000),
-					live_id: this.livePlay.live_id
-				}
-				await this.$apis.enterLive(data)
+				this.enterLive()
 			},
 			/**
 			 * 监听窗体消息
 			 * */
 			monitor() {
 				// 接收弹幕
-				this.subscribeMsg(this.livePlay.live_id)
-				uni.$on('Product', (data) => {
-					this.isShowProduct = data.value
-				})
-				uni.$on("goods_id", (data) => {
-					this.getGoodsById(data.goods_id)
-				})
-				uni.$on("likeRoom", (res) => {
-					const uid = this.$store.state.info.uid
-					this.$apis.attentionLive({ ...res.data, uid })
-					const channel = this.livePlay.live_id
-					const content = {
-						name: this.$store.state.info.userInfo.name,
-						msg: res.data.isfollow ? '关注了直播间' : '取消了关注'
-					}
-					this.publishMsg(JSON.stringify(content), channel)
-				})
-				uni.$on("cartData", (data) => {
-					const params = { 
-						uid: this.$store.state.info.uid,
-						...data
-					}
-					this.increaseCart(params)
-				})
+				this.receiveMsg(this.livePlay.live_id)
 				// 发送弹幕
 				uni.$on("barrage", (data) => {
 					const channel = this.livePlay.live_id
 					const content = {
 						name: this.$store.state.info.userInfo.name,
-						msg: data.msg
+						message: data.msg
 					}
-					this.publishMsg(JSON.stringify(content), channel)
+					this.sendMsg(this.livePlay.live_id, JSON.stringify(content))
 				})
-
+				// 用户是否关注该直播间
+				uni.$on("heart", (data) => {
+					// console.log(data)
+					this.sendMsg(this.livePlay.live_id, JSON.stringify(data))
+				})
 			},
 			/**
 			 *  获取当前显示的 webview 实例，方便操作
@@ -108,8 +91,7 @@
 			 */
 			plusPlay() {
 				const styles = {
-					'src': this.livePlay.live_url,                              // 视频地址
-					// 'top': '100upx',                                         // 播放器距屏幕上方的像素
+					'src': this.livePlay.live_url,                              // 视频地址                                       // 播放器距屏幕上方的像素
 					'width': uni.getSystemInfoSync().windowWidth + 'px',        // 播放器的宽度
 					'height': uni.getSystemInfoSync().windowHeight + 'px',      // 播放器的高度
 					'position': 'static',                                       // 播放器的布局模式
@@ -131,7 +113,7 @@
 					this.$apis.msg("视频加载中")
 				}, false)
 				this.player.addEventListener('error', (err) => {
-					console.log(JSON.stringify(err), "error")
+					// console.log(JSON.stringify(err), "error")
 					this.$apis.msg('主播已下线')
 				}, false)
 			},
@@ -151,119 +133,71 @@
 				detail.hide()
 			},
 			/**
-			 * 根据live_id 获取拉流信息
-			 *  @param {String} id 
-			 * */
-			async getLivePlayInfo() {
-				const data = {
-					uid: this.$store.state.info.uid,
-					live_id: this.livePlay.live_id
-				}
-				const result = await this.$apis.getLivePlay(data)
-				if (result.code === "000000") {
-					this.livePlay = { ...result.data }
-					const info = { 
-						live_id: this.livePlay.live_id,
-						"shop_name": this.livePlay.shop.shop_name,
-						"shop_avatar": this.livePlay.shop.shop_avatar,
-						"follow_live": this.livePlay.isfollow
-					}
-					uni.$emit("headerInfo", info)
-				}
-			},
-			/**
-			 * 根据shop_id 获取商品信息
-			 * @param {String} shop_id
-			 * */
-			async getGoodSByShop() {
-				const data = { shop_id: this.livePlay.shop.shop_id}
-				const result = await this.$apis.getGoodsByShopId(data)
-				if (result.code === "000000") {
-					// console.log(result.data)
-					uni.$emit("liveGoodsInfo", result.data)
-					uni.$emit("live_id", { live_id: this.livePlay.live_id})
-				}
-			},
-			/**
-			 * 添加购物车,
-			 * @param {Object} data 
-			 * */
-			async increaseCart(data) {
-				const result = await this.$apis.increaseCart(data)
-				if (result.code === "000000") {
-					this.$apis.msg('添加成功')
-					const detail = uni.getSubNVueById("prodDetail")
-					detail.hide("slide-out-bottom")
-				}
-			},
-			/**
-			 * @param {String} channel 
-			 * 订阅消息, 接收消息
-			 * **/
-			subscribeMsg(channel) {
-				this.$goEasy.subscribe({
-					channel: String(channel),
-					onMessage: (message) => {
-						const info = { msg: message.content }
-						uni.$emit('danmu', info)
-					}
-				})
-			},
-			/**
-			 * 发布消息
-			 * @param {String} msg 
-			 * @param {String} channel 
-			 * **/
-			publishMsg(msg, channel) {
-				this.$goEasy.publish({
-					channel: String(channel),
-					message: msg
-				})
-			},
-			/**
 			 * 离开直播间弹幕提示
 			 * */
-			 outLive() {
+			 async outLive() {
 				 const channel = this.livePlay.live_id
 				 const content = {
 					name: this.$store.state.info.userInfo.name,
-					msg: '已离开直播间'
+					message: '已离开直播间'
 				 }
-				 this.publishMsg(JSON.stringify(content), channel)
+				 this.sendMsg(this.livePlay.live_id, JSON.stringify(content))
+				 const data = {
+				 	uid: this.$store.state.info.uid,
+				 	out_time: parseInt(Date.now() / 1000),
+				 	live_id: this.livePlay.live_id
+				 }
+				 await this.$apis.outLive(data)
+				 await this.$apis.updateViewMount({type: 'out', live_id:this.livePlay.live_id })
 			 },
 			 /**
 			  * 进入直播间弹幕提示
 			  * */
-			 enterLive() {
+			 async enterLive() {
 				 const channel = this.livePlay.live_id
 				 const content = {
 				 	name: this.$store.state.info.userInfo.name,
-				 	msg: `已进入直播间`
+				 	message: `已进入直播间`
 				 }
-				 this.publishMsg(JSON.stringify(content), channel)
-			 }
+				 this.sendMsg(this.livePlay.live_id, JSON.stringify(content))
+				 const data = {
+				 	uid: this.$store.state.info.uid,
+				 	enter_time: parseInt(Date.now() / 1000),
+				 	live_id: this.livePlay.live_id
+				 }
+				 await this.$apis.enterLive(data)
+			 },
+			 /**
+			  * 接收弹幕
+			  * */
+			  receiveMsg(channel) {
+				console.log(channel)
+				this.$goEasy.subscribe({
+					  channel: String(channel),
+					  onMessage: (message) => {
+						  uni.$emit("showBarrage", message)
+					  }
+				  })
+			  },
+			  // 发送弹幕
+			  sendMsg(channel, msg) {
+				  console.log(channel ,msg)
+				  this.$goEasy.publish({
+					  channel: String(channel),
+					  message: msg
+				  })
+			  }
+		},
+		onBackPress(e) {
+			this.currentWebView = null;
 		},
 		async onUnload() {
-			uni.$off('Product')
-			uni.$off('showProduct')
-			uni.$off('barrage')
-			uni.$off('productData')
-			uni.$off('goods_id')
-			uni.$off('likeRoom')
-			uni.$off('cartData')
-			uni.$off('danmu')
-			uni.$off('headerInfo')
-			uni.$off('liveGoodsInfo')
-			uni.$off('live_id')
-			
-			const data = {
-				uid: this.$store.state.info.uid,
-				out_time: parseInt(Date.now() / 1000),
-				live_id: this.livePlay.live_id
-			}
+			uni.$off("barrage")
+			uni.$off("showBarrage")
+			uni.$off("shop_id")
+			uni.$off("head")
+			uni.$off("heart")
 			this.outLive()
-			await this.$apis.updateViewMount({type: 'out', live_id:this.livePlay.live_id })
-			await this.$apis.outLive(data)
 		}
 	}
 </script>

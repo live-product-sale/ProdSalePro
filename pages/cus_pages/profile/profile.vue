@@ -68,14 +68,8 @@
 			}
 		},
 		computed: mapState(["info"]),
-		onLoad() {
-			this.init()
-			// console.log(this.info)
-		},
 		methods: {
-			// 页面初始化
-			init() {
-			},
+			
 			// 点击编辑
 			edit() {
 				this.disabled = false
@@ -88,21 +82,17 @@
 			},
 			// 确认裁剪
 			async confirm(options) {
-				console.log(options)
+				// console.log(options)
 				this.url = options.path
 				this.$apis.msg("开始上传")
 				const result = await compressImage(options.path)
-				console.log(result)
+				// console.log(result)
 				if(result.statusCode === 200) {
 					this.info.userInfo["avatar"] = result.Location
 					this.cancle()
-					uni.showToast({
-						title: '上传成功'
-					})
+					this.$apis.msg('上传成功')
 				} else {
-					uni.showToast({
-						title: '上传失败'
-					})
+					this.$apis.msg('上传失败')
 				}
 			},
 			// 取消裁剪
@@ -114,13 +104,11 @@
 				this.disabled = true
 				const data = this.info.userInfo
 				const result = await this.$apis.perfectUserInfo(data)
-				console.log(result)
+				// console.log(result)
 				if(result.code === "000000") {
 					uni.setStorageSync("Info", this.info)
 					uni.navigateBack()
-					uni.showToast({
-						title: '保存成功'
-					})		
+					this.$apis.msg('保存成功')	
 				}	
 			},
 			// 换头像
@@ -149,7 +137,7 @@
 				camera.captureImage((path) => {
 					this.url = path
 				}, (error) => {
-					console.log(error)
+					// console.log(error)
 				}, {resolution:res,format:fmt})
 			},
 		},

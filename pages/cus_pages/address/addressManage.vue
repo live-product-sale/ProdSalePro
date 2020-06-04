@@ -10,16 +10,16 @@
 			@click-right="deleteBtn" ></nav-bar>
 		<view class="row b-b">
 			<text class="tit">联系人</text>
-			<input class="input" type="text" v-model="addressData.name" placeholder="收货人姓名" placeholder-class="placeholder" />
+			<input class="input" type="text" :value="addressData.name" @blur="getName" placeholder="收货人姓名" placeholder-class="placeholder" />
 		</view>
 		<view class="row b-b">
 			<text class="tit">手机号</text>
-			<input class="input" type="number" v-model="addressData.mobile" placeholder="收货人手机号码" placeholder-class="placeholder" />
+			<input class="input" type="number" :value="addressData.mobile" @blur="getPhone" placeholder="收货人手机号码" placeholder-class="placeholder" />
 		</view>
 		<view class="row b-b">
 			<text class="tit">地址</text>
 			<text @click="chooseLocation" class="input">
-				{{addressData.addressName}}
+				{{addressData.address}}
 			</text>
 			<text class="yticon icon-shouhuodizhi"></text>
 		</view>
@@ -47,11 +47,9 @@
 					id: "",
 					uid: "",
 					name: '',
-					mobile: '',
-					addressName: '在地图选择',
-					address: '',
+					mobile: null,
+					address: '在地图选择',
 					area: '',
-					// isDefault: false
 				}
 			}
 		},
@@ -80,13 +78,21 @@
 					this.$apis.prePage().init()
 				}
 			},
-			
+			// 获取手机号
+			getPhone(e) {
+				// console.log(e.detail.value)
+				this.addressData.mobile = e.detail.value
+			},
+			// 获取用户姓名
+			getName(e) {
+				this.addressData.name = e.detail.value
+			},
 			//地图选择地址
 			chooseLocation(){
 				uni.chooseLocation({
 					success: (data)=> {
-						this.addressData.addressName = data.name;
-						this.addressData.address = data.name;
+						// console.log(data)
+						this.addressData.address = data.address;
 					}
 				})
 			},
@@ -101,10 +107,10 @@
 					this.$apis.msg('请输入正确的手机号码');
 					return;
 				}
-				// if(!data.address){
-				// 	this.$apis.msg('请在地图选择所在位置');
-				// 	return;
-				// }
+				if(!data.address){
+					this.$apis.msg('请在地图选择所在位置');
+					return;
+				}
 				if(!data.area){
 					this.$apis.msg('请填写门牌号信息');
 					return;
@@ -112,14 +118,11 @@
 				await this.submitAddress()
 			},
 			deleteBtn() {
-				uni.showModal({
-					content:"确定删除改地址吗",
-					success: (e) => {
-						if(e.confirm) {
-							this.deleteAddress()
-						} else if(e.cancel) {
-							this.$apis.msg('取消删除')
-						}
+				this.$apis.modal("确定删除改地址吗", (e) => {
+					if(e.confirm) {
+						this.deleteAddress()
+					} else {
+						this.$apis.msg('取消删除')
 					}
 				})
 			},
@@ -137,7 +140,7 @@
 			async submitAddress() {
 				const action = this.manageType
 				const uid = this.$store.state.info.uid
-				const data = { action,...this.addressData, uid }
+				const data = { action,...this.addressData, uid ,addressName: undefined}
 				const result = await this.$apis.updateOrCreate(data) 
 				if(result.code === "000000") {
 					this.$apis.msg(`地址${this.manageType=='edit' ? '修改': '添加'}成功`);
@@ -152,9 +155,7 @@
 <style lang="scss">
 	page{
 		background: $page-color-base;
-		// padding-top: 16upx;
 	}
-
 	.row{
 		display: flex;
 		align-items: center;
@@ -162,7 +163,6 @@
 		padding:0 30upx;
 		height: 110upx;
 		background: #fff;
-		
 		.tit{
 			flex-shrink: 0;
 			width: 120upx;

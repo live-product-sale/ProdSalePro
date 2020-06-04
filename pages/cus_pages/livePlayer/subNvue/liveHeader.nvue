@@ -17,6 +17,8 @@
 
 <script>
 	import uniIcon from '@/components/uni-icons/uni-icons.vue'
+	import { getLivePlay, attentionLive, msg } from '@/apis/index.js'
+	
 	export default {
 		components: {
 			uniIcon
@@ -24,48 +26,54 @@
 		data() {
 			return {
 				liveInfo: {
-					// shop_name: '',
-					// live_id: '',
-					// shop_avatar: '',
-					// status: false
+					shop_name: '',
+					live_id: '',
+					shop_avatar: '',
+					follow_live: false
 				},
 				cacheHeader: {}
 			}
 		},
-		onLoad() {
-			this.cacheHeader = uni.getStorageSync("cacheHeader")
-			this.liveInfo = this.cacheHeader
-			uni.$on("headerInfo", (res) => {
-				uni.setStorageSync('cacheHeader', res)
-				this.liveInfo = res
+		onLoad(params) {
+		   const head = uni.getStorageSync("head") || {}
+		   if(head) {
+			 this.liveInfo.live_id = head.live_id
+			 this.liveInfo.shop_name = head.shop_name
+			 this.liveInfo.shop_avatar = head.shop_avatar
+			 this.liveInfo.follow_live = head.isfollow  
+		   }
+			uni.$on("head", (data) => {
+				// console.log(data)
+				uni.setStorageSync("head", data)
+				this.liveInfo.live_id = data.live_id
+				this.liveInfo.shop_name = data.shop_name
+				this.liveInfo.shop_avatar = data.shop_avatar
+				this.liveInfo.follow_live = data.isfollow
 			})
-			
 		},
 		methods:{
-			likebtn() {
+			// 关注直播间或取消直播间
+			async likebtn() {
 				this.liveInfo.follow_live = !this.liveInfo.follow_live
-				uni.$emit("likeRoom", { 
-					data: { 
-						live_id: this.liveInfo.live_id, 
-						isfollow: this.liveInfo.follow_live,
-						},
-					})
-				if(this.liveInfo.follow_live) {
-					uni.showToast({
-						title: '您已关注该直播间',
-					})
-				} else {
-					uni.showToast({
-						title:'您已取消关注该直播间'
-					})
+				const data = { 
+					uid: uni.getStorageSync("Info").uid,
+					live_id: this.liveInfo.live_id,
+					isfollow: this.liveInfo.follow_live
+				}
+				const result = await attentionLive(data)
+				if(result.code === "000000") {
+					this.liveInfo.follow_live ? msg('您已关注该直播间') : msg('您已取消关注该直播间')
+					const content = {
+						name: uni.getStorageSync("Info").userInfo.name,
+						message: this.liveInfo.follow_live ? '关注了直播间' : '取消了关注'
+					}
+					uni.$emit("heart", content)
 				}
 			},
 			backLive() {
-				uni.showToast({
-					title: '退出直播室'
-				})
-			}
-		}
+				msg('退出直播室')
+			}, 
+		},
 	}
 </script>
 

@@ -45,7 +45,7 @@
 			};
 		},
 		onLoad(options) {
-			console.log(options.order_id)
+			// console.log(options.order_id)
 			this.order_id = options.order_id
 			this.init()
 		},

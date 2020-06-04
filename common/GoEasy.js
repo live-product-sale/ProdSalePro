@@ -10,21 +10,6 @@ export default new GoEasy({
 		console.log('连接断开')
 	 },
 	 onConnectFailed: function(error) {
-	    console.log('连接失败或错误')
+	    console.log('连接失败或错误', error)
 	 }
 })
-
-/**
- * @param {String} channel 
- * @return { String} msgContent
- * 订阅消息, 接收消息
- * **/
- 
- /**
-  * 发布消息
-  * @param {String} msg 
-  * @param {String} channel 
-  * ***/
-
-  
- 

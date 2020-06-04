@@ -55,6 +55,9 @@
 			}
 		},
 		onLoad() {
+			
+		},
+		mounted() {
 			this.init()
 		},
 		methods: {
@@ -67,14 +70,16 @@
 					cpassword: '',
 					code:''
 				}
-				
 			},
 			/**
 			 * 登陆接口
 			 */
 		    async login () {
+				// console.log('111')
+				if(!this.check()) return;
 				const userinfo = JSON.parse(JSON.stringify(this.userinfo))
-				const result = await this.$apis.postLogin(userinfo) 
+				const result = await this.$apis.postLogin(userinfo)
+				console.log(result)
 				if(result.code === '000000') {
 					// 设置登陆状态
 					this.setLoginState(result.data)
@@ -113,6 +118,30 @@
 			 */
 			goRegister: function() {
 				uni.navigateTo({url: 'register'})
+			},
+			/**
+			 * 检查手机格式
+			 * @return { Boolean } result
+			 */
+			check: function() {
+				const pattern = new RegExp(/^1[3456789]\d{9}$/)
+				if(!this.userinfo.cphone) {
+					this.$apis.msg('手机号为空')
+					return false
+				}
+				if(!pattern.test(this.userinfo.cphone)) {
+				    this.$apis.msg('手机号格式错误')
+					return false
+				}
+				if(!this.userinfo.cpassword) {
+					this.$apis.msg('密码为空')
+					return false
+				}
+				if(!this.userinfo.code) {
+					this.$apis.msg('验证码为空')
+					return false
+				}
+				return true
 			}
 		}
 	}

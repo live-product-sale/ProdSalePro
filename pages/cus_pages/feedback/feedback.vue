@@ -52,7 +52,7 @@
 		},
 		methods: {
 			radioChange(e) {
-				console.log(e.target.value)
+				// console.log(e.target.value)
 				for( var i = 0; i < this.feedTitle.length; i++) {
 					if(this.feedTitle[i].value === e.target.value) {
 						 this.current = i;
@@ -65,7 +65,7 @@
 				uni.hideKeyboard()
 			},
 			async submitAdvice() {
-				console.log(this.current)
+				// console.log(this.current)
 				if(this.current === null) { 
 					this.$apis.msg('请选择反馈类型')
 					return

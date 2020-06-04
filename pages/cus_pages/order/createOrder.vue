@@ -68,17 +68,13 @@
 
 <script>
 	import uniIcons from '@/components/uni-icons/uni-icons.vue'
+	
 	export default {
 		components: {
 			uniIcons
 		},
 		data() {
 			return {
-				/*
-				  orderList: [{ shop_id: "", shop_avatar:"", shop_name: "",
-						  goods: [{{goods_id:"",goods_name:"",goods_price:"", net_weight:"",specification:"", goods_num:""}]
-					  }]
-				*/
 				shop_id: "",
 				goods_id: "",
 				orderList: [],
@@ -98,7 +94,6 @@
 				this.getCartByuid(option.uid)
 			} else {
 			   const data = JSON.parse(option.data)
-			   console.log(data)
 			   this.live_id = data.live_id
 			   await this.init(data)
 			}
@@ -155,7 +150,6 @@
 						 }
 					 })
 					 this.orderList.push(result.data)
-					 console.log(this.orderList)
 				 }
 			 },
 			 /**
@@ -165,7 +159,7 @@
 				  const data = { uid: uid }
 				   const result = await this.$apis.getCartGoodsByuid(data)
 				   if(result.code === "000000") {
-					   console.log(result.data)
+					   // console.log(result.data)
 					   this.orderList = result.data
 				   }
 			  },
@@ -179,7 +173,7 @@
 				   let goodsInfo = []
 				   this.orderList.forEach(item => {
 					      item.goods.forEach(iitem => {
-						     goodsInfo.push(iitem)
+						     goodsInfo.push({...iitem, shop_id: item.shop_id})
 					  })
 				   })
 				   const data = { 
@@ -213,7 +207,7 @@
 					  const channel = this.live_id
 					  const content = {
 						  name: this.$store.state.info.userInfo.name,
-						  msg: '提交订单'
+						  message: '提交订单'
 					  }
 					  this.$goEasy.publish({
 					  	channel: String(channel),

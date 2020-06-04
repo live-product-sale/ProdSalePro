@@ -10,7 +10,7 @@
 		<view v-if="product.length === 0">
 		   <text>商品为空</text>
 		</view>
-		<list show-scrollbar="false">
+		<list show-scrollbar="false"> 
 			<cell class="product-item" v-for="(item , index) in product" :key="index">
 				<image class="prod-image" :src="item.goods_avatar" ></image>
 				<view class="prod-info">
@@ -19,7 +19,7 @@
 						<text style="color:#E45E47; font-size: 25upx;">查看详情>></text>
 					</view>
 					<view class="price">
-						<text style="color:#E45E47; font-size: 30upx;">¥{{item.goodsinfos[0].goods_price}}</text>
+						<text style="color:#E45E47; font-size: 30upx;">¥{{item.goods_infos[0].goods_price}}</text>
 						<view class="cart" hover-class="cart-hover"   >
 							<uni-icon type="cart" color="#E45E47" size="20" @click="toDetail(item)"></uni-icon>
 						</view>
@@ -32,6 +32,7 @@
 
 <script>
 	import uniIcon from '@/components/uni-icons/uni-icons.vue'
+	import { getGoodsByShopId } from '@/apis/index.js'
 	
 	export default {
 		components: {
@@ -39,6 +40,7 @@
 		},
 		data(){
 			 return {
+				 shop_id: "",
 				 product: []
 			 }
 		},
@@ -61,12 +63,33 @@
 			   uni.navigateTo({
 			   	url: "/pages/cus_pages/product/product?goods_id="+item.goods_id
 			   })
+			},
+			// 获取商品信息
+			async getGoodsList(data) {
+				const result = await getGoodsByShopId(data)
+				// console.log(result)
+				if(result.code === "000000") {
+					this.product = result.data
+					// console.log(this.product)
+				}
 			}
 		},
-		onLoad() {
-			uni.$on("liveGoodsInfo", (res) => {
-				this.product = res
-			})		
+		onLoad(params) {
+			const shop_id = uni.getStorageSync("shop_id") || {}
+			console.log(shop_id)
+			if(shop_id) {
+				this.shop_id = shop_id
+				this.getGoodsList({shop_id})	
+			}
+			uni.$on("shop_id", (data) => {
+				// console.log(data)
+				uni.setStorageSync("shop_id", data.shop_id)
+				this.shop_id = data.shop_id
+				this.getGoodsList({shop_id: data.shop_id})	
+			})	
+		},
+		onUnload() {
+			uni.$off("goodsItem")
 		}
 	}
 </script>

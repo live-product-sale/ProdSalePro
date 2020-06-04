@@ -71,6 +71,9 @@
 		onLoad() {
 			//页面生命周期函数
 		},
+		mounted() {
+			this.init()
+		},
 		methods: {
 			// 页面初始化
 			init() {
@@ -86,10 +89,7 @@
 			sendCode: async function() {
 				this.checkTel()
 				if(!this.format) {
-					uni.showToast({
-						title:'手机格式不正确',
-						duration: 1500
-					})
+					this.$apis.msg('手机格式不正确')
 					return
 				}
 				this.codeBtn.waitingCode = false
@@ -108,14 +108,9 @@
 					cphone: this.userInfo.cphone
 				})
 				if(result.code === '000000') {
-					uni.showToast({
-						title:'发送成功',
-						duration: 2000
-					})
+					this.$apis.msg('发送成功')
 				} else {
-					uni.showModal({
-						content: result.data.toString()
-					})
+					this.$apis.msg('发送失败')
 				}
 			},
 			/**
@@ -130,16 +125,12 @@
 			checkTel: function() {
 				const pattern = new RegExp(/^1[3456789]\d{9}$/)
 				if(!this.userInfo.cphone) {
-					uni.showModal({
-						content: '手机号为空'
-					})
+					this.$apis.msg('手机号为空')
 					this.format = false
 					return;
 				}
 				if(!pattern.test(this.userInfo.cphone)) {
-					uni.showModal({
-						content: '手机号格式错误'
-					})
+					this.$apis.msg('手机号格式错误')
 					this.format = false
 					return;
 				} else {
@@ -151,28 +142,20 @@
 			 */
 			register: async function() {
 				if(this.userInfo.cpassword !== this.repassword) {
-					uni.showModal({
-						content: '密码不一致，重新输入',
-					})
+					this.$apis.msg('密码不一致，重新输入')
 					this.repassword = ''
 					this.userInfo.cpassword = ''
 					return;
 				}
 				const userInfo = JSON.parse(JSON.stringify(this.userInfo))
 				const result = await this.$apis.postRegister(userInfo)
-				console.log(result)
+				// console.log(result)
 				if(result.code === '000000' ) {
 					this.gotoLogin()
-					uni.showToast({
-						title:'注册成功，重新登陆',
-					    position: 'center',
-						duration: 500
-					})
+					this.$apis.msg('注册成功，重新登陆')
 				} else {
 					this.init()
-					uni.showModal({
-						content: '注册失败，请重新注册'
-					})
+					this.$apis.msg('注册失败，请重新注册')
 				}
 			}
 		},

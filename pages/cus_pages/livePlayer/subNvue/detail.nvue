@@ -21,7 +21,7 @@
 		<view class="net-weight">
 			<text class="net-title">净含量</text>
 			<view class="container">
-				<template v-for="(item, index) in goods.goodsinfos">
+				<template v-for="(item, index) in goods.goods_infos">
 					<text 
 					  class="net-val" 
 					  :key="item.id" 
@@ -33,7 +33,7 @@
 		<view class="specification">
 			<text class="specification-title">规格</text>
 			<view class="container">
-				<template v-for="(item, index) in goods.goodsinfos ">
+				<template v-for="(item, index) in goods.goods_infos ">
 					<text 
 					  class="specification-val"
 					  :class="{ checked: item.specification == checked.specification}"
@@ -65,6 +65,7 @@
 <script>
 	import uniIcon from '@/components/uni-icons/uni-icons.vue'
 	import uniNumberBox from '@/components/uni-number-box/uni-number-box.vue'
+	import { increaseCart, msg } from '@/apis/index.js'
 	
 	export default {
 		components: {
@@ -84,16 +85,14 @@
 				price: 0,
 			}
 		},
-		onLoad() {
+		onLoad(params) {
+			this.live_id = params.live_id
 			uni.$on("goodsItem", (res) => {
 				// console.log(res)
 				this.goods = res.goods
-				this.checked.net_weight = this.goods.goodsinfos[0].net_weight
-				this.checked.specification = this.goods.goodsinfos[0].specification
-				this.price = this.goods.goodsinfos[0].goods_price
-			})
-			uni.$on("live_id", (res) => {
-				this.live_id = res.live_id
+				this.checked.net_weight = this.goods.goods_infos[0].net_weight
+				this.checked.specification = this.goods.goods_infos[0].specification
+				this.price = this.goods.goods_infos[0].goods_price
 			})
 		},
 		methods: {
@@ -106,23 +105,34 @@
 				const isDetail = uni.getSubNVueById("prodDetail")
 				isDetail.hide("slide-out-bottom")
 			},
+		    // 添加购物车或下单前进行参数检查
+            missAttribute() {
+				if(!this.checked.net_weight || !this.checked.specification) {
+					msg('请选择好商品格式')
+					return false
+				}
+				return true
+			},
 			// 加入购物车
 			async addTocart() {
-				if(!this.checked.net_weight || !this.checked.specification) {
-					uni.showToast({
-						title: "请选择好商品格式",
-						icon: "none"
-					})
-					return
-				}
+				if(!this.missAttribute()) return
 				const data = this.packageData()
-				uni.$emit("cartData", data)
+				const result = await increaseCart(data)
+				if(result.code === "000000") {
+					uni.showModal({
+						content:"已添加购物车，是否前去购物车查看",
+						success(e) {
+							e.confirm ? uni.switchTab({ url: "/pages/cus_pages/cart/cart"}) : "",
+							e.cancel ? msg('添加成功') : ""
+						}
+					})
+				}
 			},
 			//选择商品款式
 			check(obj, value) {
 				const key = Object.entries(obj).filter(item => item[1] === value).map(m => m[0])
 				this.$set(this.checked, key, value)
-				this.goods.goodsinfos.map(item => {
+				this.goods.goods_infos.map(item => {
 					if(item.net_weight === this.checked.net_weight && item.specification === this.checked.specification) {
 						this.price = item.goods_price
 					}
@@ -130,15 +140,7 @@
 			},
 			// 直接购买
 			directPurchase() {
-				if(!this.checked.net_weight || !this.checked.specification || this.price === 0) {
-					uni.showToast({
-						title: '请选择商品格式'
-					})
-					return
-				}
-				uni.showToast({
-					title: '创建订单'
-				})
+				if(!this.missAttribute()) return
 				const data = {
 					live_id: this.live_id,
 					shop_id: this.goods.shop_id, 
@@ -148,6 +150,7 @@
 					goods_num:this.goods_num
 				}
 				uni.getCurrentSubNVue().hide("slide-out-bottom")
+				msg('创建订单')
 				uni.redirectTo({
 					url: '../order/createOrder?data='+JSON.stringify(data)
 				})
@@ -158,6 +161,7 @@
 			 * */ 
 			packageData() {
 				const data = {
+					uid: uni.getStorageSync("Info").uid,
 					goods_id: this.goods.goods_id,
 					shop_id: this.goods.shop_id,
 					goods_price: this.price,

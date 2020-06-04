@@ -79,6 +79,9 @@
 			}
 		},
 		onLoad() {
+			
+		},
+		mounted() {
 			this.init();
 		},
 		components:{
@@ -157,13 +160,13 @@
 					content: '确定清除历史搜索记录？',
 					success: (res) => {
 						if (res.confirm) {
-							console.log('用户点击确定');
+							// console.log('用户点击确定');
 							this.oldKeywordList = [];
 							uni.removeStorage({
 								key: 'OldKeys'
 							});
 						} else if (res.cancel) {
-							console.log('用户点击取消');
+							// console.log('用户点击取消');
 						}
 					}
 				});
@@ -176,8 +179,11 @@
 			async doSearch(key) {
 				key = key ? key : this.keyword ? this.keyword : this.defaultKeyword;
 				this.keyword = key;
+				if(!this.checkKey(this.keyword)) {
+					this.keyword = ""
+					return;
+				}
 				this.saveKeyword(key); //保存为历史 
-				// this.$apis.msg(key)
 				uni.showLoading({
 					title: '正在加载'
 				})
@@ -197,7 +203,7 @@
 				uni.getStorage({
 					key: 'OldKeys', 
 					success: (res) => {
-						console.log(res.data);
+						// console.log(res.data);
 						var OldKeys = JSON.parse(res.data);
 						var findIndex = OldKeys.indexOf(keyword);
 						if (findIndex == -1) {
@@ -223,6 +229,26 @@
 						this.oldKeywordList = OldKeys; //更新历史搜索
 					}
 				});
+			},
+			// 正则检查
+			/**
+			 * @param { String } keyWord
+			 * @return { Boolean } result
+			 * */
+			checkKey(keyWord) {
+				const str = "^[\u4E00-\u9FA5]{1,8}$"
+				const pattern  = new RegExp(str)
+				if(!keyWord) {
+					this.$apis.msg('输入为空')
+					return false
+				}
+				if(!pattern.test(keyWord)) {
+					this.$apis.msg('请输入1-8个汉字')
+					return false
+				}
+				return true
+				
+				
 			}
 		}
 	}

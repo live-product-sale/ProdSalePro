@@ -16,7 +16,7 @@
 				newPassword: ""
 			}
 		},
-		onLoad() {
+		mounted() {
 			this.init()
 		},
 		methods: {
@@ -26,12 +26,20 @@
 			},
 			// 提交新密码
 			async submit() {
+				if(!this.cpassword) {
+					this.$apis.msg("原密码为空")
+					return;
+				}
+				if(!this.newPassword) {
+					this.$apis.msg("新密码为空")
+					return;
+				}
 				const data = { 
 					uid: this.$store.state.info.uid, 
 					cphone: this.cphone,
 					oldPassword: this.cpassword,
 					newPassword: this.newPassword
-					}
+				}
 				const result = await this.$apis.updatePassword(data)
 				if(result.code === "000000") {
 					this.$apis.msg(result.msg+',请重新登陆')
@@ -51,7 +59,6 @@
 		width: 94%;
 		display: flex;
 		flex-direction: column;
-		// justify-content: center;
 		align-items: center;
 		.input-item {
 			height: 80upx;

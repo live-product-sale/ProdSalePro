@@ -3,7 +3,7 @@
 		<view class="header" >
 			<view class="userinfo">
 				<view class="face">
-					<template v-if="userInfo.avatar!== null">
+					<template v-if="userInfo.avatar && userInfo.avatar!== null">
 						<image :src="'http://'+userInfo.avatar" mode="aspectFill" lazy-load="true"></image>
 					</template>
 					<template v-else>
@@ -11,7 +11,7 @@
 					</template>
 				</view>
 				<view class="info">
-					<template v-if="userInfo.name !== null">
+					<template v-if="userInfo.name && userInfo.name !== null">
 						<view class="username">{{userInfo.name}}</view>
 					</template>
 					<template v-else>
@@ -58,18 +58,24 @@
 					},
 					{
 						key: 2,
-						name: '待收货',
+						name: '待发货',
 						to_page: '../order/order?state=2',
 						url: '../../../static/center/2.png'
 					},
 					{
 						key: 3,
-						name: '待评价',
+						name: '待收货',
 						to_page: '../order/order?state=3',
-						url: '../../../static/center/3.png'
+						url: '../../../static/center/2.png'
 					},
 					{
 						key: 4,
+						name: '待评价',
+						to_page: '../order/order?state=4',
+						url: '../../../static/center/3.png'
+					},
+					{
+						key: 5,
 						name: '全部订单',
 						to_page: '../order/order?state=0',
 						url: '../../../static/center/4.png'

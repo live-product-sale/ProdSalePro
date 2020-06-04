@@ -1,5 +1,5 @@
 import http from './http.js'
-
+// import goEasy from '@/common/GoEasy.js'
 /****************************用户模块*******************************/
 // 用户登陆
 export const postLogin = (data) => http.POST('/user/login', data)
@@ -72,10 +72,12 @@ export const getShopInfobyShopId = (data) => http.GET('/shop/shopInfo', data)
 /*****************************商品模块*******************************/
 // 根据shop_id获取商品信息
 export const getGoodsByShopId = (data) => http.GET('/goods/goodsbyshop', data)
-// 根据shop_id创建商品
-// export const createGoods = (data) => http.POST('/goods/creategoods', data)
-// 根据商品id 完善商品信息
-// export const perfectGoods = (data) => http.POST('/goods/goodsInfo', data)
+// 关注商店
+export const heartShop = (data) => http.POST('/shop/heart', data)
+// 进入店铺
+export const updateView = (data) => http.POST('/shop/updateViews', data)
+// 判断用户是否已关注过
+export const getIsHeart = (data) => http.POST('/shop/isheart', data)
 // 根据商品id 获取商品详情
 export const getGoodsByGoodsId = (data) => http.GET('/goods/goodsInfo', data)
 export const getGoodsById = (data) => http.GET('/goods/goodsSimpleinfo', data)
@@ -156,4 +158,40 @@ export function debounce(fn, interval = 600) {
 		}, interval)
 	}
 }
+export function modal (content = null, succCallback = null, failCallback = null) {
+	uni.showModal({
+		content: content,
+		success: succCallback,
+		fail: failCallback
+	})
+}
+/**
+ * @param {String} channel 
+ * @return { String} msgContent
+ * 订阅消息, 接收消息
+ * **/
+//  export const subscribeMsg = (channel) => {
+// 	console.log(channel, 'sub')
+//  	goEasy.subscribe({
+//  		// channel: String(channel),
+// 		channel: '111',
+//  		onMessage: (message) => {
+// 			console.log(message)
+//  			const info = { msg: message.content }
+// 			console.log(typeof message,"ok")
+//  		}
+//  	})
+// }
+ /**
+   * 发布消息
+   * @param {String} msg 
+   * @param {String} channel 
+   * ***/
+ // export const publishMsg = (msg, channel) => {
+	//  console.log(msg, channel)
+ // 	goEasy.publish({
+ // 		channel: String(channel),
+ // 		message: msg
+ // 	})
+ // }
 /***********************使用测试数据**********************/

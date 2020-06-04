@@ -48,13 +48,15 @@
 			const data = JSON.parse(options.data)
 			this.Title = data.type
 		    this.shop_class = data.class
+		},
+		mounted() {
 			this.init()
 		},
 		methods: {
 			// 页面初始化
-			async init() {
-	            await this.getRangeTabInfo()
-				await this.getLive()
+			init() {
+	            this.getRangeTabInfo()
+				this.getLive()
 			},
 			// 点击某个种类
 			tabChange(index) {
@@ -64,7 +66,7 @@
 			// 滑动屏幕，改变某个类别
 			changeTab(e) {
 				this.tabCurrentIndex = e.detail.current
-				console.log(this.tabList[this.tabCurrentIndex])
+				// console.log(this.tabList[this.tabCurrentIndex])
 				if(this.tabList[this.tabCurrentIndex].goods_id === "000") {
 					this.getLive()
 					return
@@ -88,11 +90,6 @@
 					this.liveList = result.data
 				}
 			},
-			// // 加载更多数据
-			// async loadMoreData() {
-			// 	await this.getLive()
-			// 	this.loadStatus = "noMore"
-			// }
 		},
 		components: {
 			NavBar,

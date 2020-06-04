@@ -2,10 +2,10 @@
 	<view class="container">
 		<view class="carousel">
 			<swiper indicator-dots circular=true duration="400">
-				<swiper-item class="swiper-item" v-for="(item,index) in imgList" :key="index">
+				<swiper-item class="swiper-item">
 					<view class="image-wrapper">
 						<image
-							:src="item.src" 
+							:src="goodsInfo.goods_avatar" 
 							class="loaded" 
 							mode="aspectFill"
 						></image>
@@ -206,21 +206,21 @@
 		},
 		onLoad(options){	
 			this.goods_id = options.goods_id
-			// console.log(this.goods_id)
-			this.init()
-			
+		},
+		mounted() {
+			this.init()	
 		},
 		methods:{
 			// 页面初始化
 			async init() {
 				await this.getGoodsInfo()
 				this.defaultSelected()
-				await this.getCommentByGoodsId()
+				this.getCommentByGoodsId()
 				let allStar = 0;  
 				this.comment.forEach(item => {
 					allStar = allStar + parseInt(item.star_num)
 				})
-				this.goodsRate = (allStar / (this.comment.length * 5)).toFixed(2) * 100
+				this.goodsRate = this.comment.length !== 0 ?(allStar / (this.comment.length * 5)).toFixed(2) * 100 : '0'
 			},
 			// 默认选择商品属性
 			defaultSelected() {
@@ -245,7 +245,7 @@
 			 * @param { String } content
 			 * */
 			selectSpec(type, content){
-				console.log(type, content)
+				// console.log(type, content)
 				this.specSelected[type] = content
 			},
 			//收藏
@@ -292,10 +292,11 @@
 				const params = { goods_id: this.goods_id }
 				const result = await this.$apis.getGoodsByGoodsId(params)
 				if(result.code === "000000") {
+					console.log(result)
 					this.live_id = result.data.live_id
 					this.shop_id = result.data.result.shop_id
 					this.goodsInfo = result.data.result
-					this.specList = this.dealGoodsAttributes(result.data.result.goodsinfos)
+					this.specList = this.dealGoodsAttributes(result.data.result.goods_infos)
 				}
 			},
 			/**

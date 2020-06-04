@@ -43,14 +43,10 @@
 			},
 			onClickInLive(item) {
 			  if(!item.status) {
-			  	uni.showToast({
-			  		title: '主播不再线'
-			  	})
+				this.$apis.msg('主播不再线')
 			  	return;
 			  }
-			  uni.showToast({
-			     title: '进入直播间'
-			  })
+			  this.$apis.msg('进入直播间')
 			  uni.navigateTo({
 			  	url: '/pages/cus_pages/livePlayer/livePlayer?live_id='+item.live_id
 			  })

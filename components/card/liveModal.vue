@@ -5,7 +5,7 @@
 				<template v-if="status">
 					<view class="status"></view>直播中
 				</template>
-				<template v-else-if="status">
+				<template v-else>
 					<view class="status" :style=" {borderColor: '#DDDDDD' }" ></view>未上线
 				</template>
 			</view>
@@ -84,14 +84,10 @@
 			async onClick(status) {
 				// console.log(status, this.live_id)
 				if(!status) {
-					uni.showToast({
-						title: '主播不再线'
-					})
+					this.$apis.msg('主播不再线')
 					return;
 				}
-				uni.showToast({
-			       title: '进入直播间'
-				})
+				this.$apis.msg('进入直播间')
 				await this.$apis.updateViewMount({ live_id: this.live_id, type: 'enter' })
 				uni.navigateTo({
 					url: '/pages/cus_pages/livePlayer/livePlayer?live_id='+this.live_id
@@ -101,7 +97,7 @@
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 	.live-card {
 		position: relative;
 		display: flex;
@@ -165,6 +161,7 @@
 					background-repeat: no-repeat;
 				}
 				text {
+					color: $color-primary;
 					margin-top: 15upx;
 					font-size: 25upx;
 				}
@@ -186,11 +183,12 @@
 				background-image: url(../../static/imgs/view_num_pic.png);
 				background-position: center;
 				background-size: 38upx 38upx;
-				background-repeat: no-repeat;
+				background-repeat: no-repeat;	
 			}
 			text {
 				line-height: 20upx;
 				font-size: 20upx;
+				color: $color-primary;
 			}
 		}
 		.live-info {

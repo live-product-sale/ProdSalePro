@@ -81,11 +81,7 @@
 			sendCode: async function() {
 				this.checkTel()
 				if(!this.mobileFormat) {
-				   uni.showToast({
-				   	title: '手机格式不正确',
-					icon: 'none',
-					duration: 2000
-				   })
+				   this.$apis.msg('手机格式不正确')
 				   return 
 				}
 				this.codeBtn.waitingCode = false
@@ -103,16 +99,10 @@
 				const result = await this.$apis.getMsgCode({
 					cphone: this.userInfo.cphone
 				})
-				// console.log(result)
 				if(result.code === '000000') {
-					uni.showToast({
-						title:'发送成功',
-						duration: 2000
-					})
+					this.$apis.msg('发送成功')
 				} else {
-					uni.showModal({
-						content: result.data.toString()
-					})
+					this.$apis.msg('发送失败')
 				}
 			},
 			/**
@@ -126,24 +116,17 @@
 			 */
 			modifyPass: async function() {
 				if(this.repassword !== this.userInfo.cpassword) {
-					uni.showToast({
-						title: '密码不一致',
-						duration: 1500,
-						icon: 'none'
-					})
+					this.$apis.msg('密码不一致')
 					this.repassword = ''
 					this.userInfo.cpassword = ''
 					return;
 				}
-				// this.userInfo.cpassword = md5(this.repassword)
 				const userInfo = JSON.parse(JSON.stringify(this.userInfo))
 				const result = await this.$apis.resizePass(userInfo)
 				if(result.code === '000000') {
 					this.changSuccess = true
 				} else {
-					uni.showModal({
-						content: result.msg
-					})
+					this.$apis.msg(result.msg)
 				}
 			},
 			/**
@@ -152,10 +135,7 @@
 			checkTel: function() {
 				const pattern =  new RegExp(/^1[3456789]\d{9}/)
 				if(!pattern.test(this.userInfo.cphone )){
-					uni.showToast({
-						title:'手机号不合法',
-						icon: 'none'
-					})
+					this.$apis.msg('手机号不合法')
 					this.mobileFormat = false
 					return 
 				} else {

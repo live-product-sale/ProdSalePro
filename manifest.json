@@ -13,6 +13,14 @@
             "runtimeVersion" : "2.6.16", //根据实际情况填写  
             "compilerVersion" : "2.6.16" //根据实际情况填写  
         },
+        "permissions" : {
+            "VideoPlayer" : {
+                "description" : "视频播放"
+            },
+            "LivePusher" : {
+                "description" : "直播推流"
+            }
+        },
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
             "waiting" : true,
@@ -74,7 +82,7 @@
                 },
                 "ad" : {},
                 "maps" : {
-                    "baidu" : {
+                    "amap" : {
                         "appkey_ios" : "__UNI__1620CB0",
                         "appkey_android" : "__UNI__1620CB0"
                     }

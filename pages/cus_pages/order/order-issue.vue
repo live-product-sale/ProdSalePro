@@ -29,7 +29,7 @@
 		methods: {
 			// 发布评论
 			async submit(options) {
-				console.log(options.score, options.text)
+				// console.log(options.score, options.text)
 				if(!options.score || !options.text) {
 					this.$apis.msg("评论不能为空")
 					return
@@ -55,7 +55,7 @@
 			},
 			//监听分数
 			scoreChange(score) {
-				console.log(score)
+				// console.log(score)
 				this.score = score
 			}
 		},

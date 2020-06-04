@@ -35,9 +35,9 @@
 		},
 		methods: {
 			// 页面初始化
-			init() {
-				this.getAddressData()
-			},
+			// init() {
+			// 	this.getAddressData()
+			// },
 			//选择地址
 			checkAddress(item){
 				if(this.source == 1){

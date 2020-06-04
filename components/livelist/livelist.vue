@@ -5,16 +5,16 @@
 				<live-card 
 				  class="item"
 				  :key="item.shop_id"
-				  :live_id="item.live.live_id"
-				  :goods_avatar="item.goods[0].goods_avatar" 
-				  :goods_price="item.goods[0].goodsinfos[0].goods_price"
-				  :status="item.live.status" 
+				  :live_id="item.live? item.live.live_id: null"
+				  :goods_avatar="item.goods[0] ? item.goods[0].goods_avatar: null" 
+				  :goods_price="item.goods[0] && item.goods[0].goods_infos[0] ? item.goods[0].goods_infos[0].goods_price: null"
+				  :status="item.live? item.live.status : null" 
 				  :user_name="item.shop_name" 
 				  :introduction="item.instructions"
-				  :live_avatar="item.live.live_avatar"
+				  :live_avatar="item.live? item.live.live_avatar: null"
 				  :shop_avatar="item.shop_avatar"
-				  :att_amount="amountFormat(item.live.att_amount)"
-				  :view_amount="amountFormat(item.live.view_amount)"
+				  :att_amount="amountFormat(item.live? item.live.att_amount: 0)"
+				  :view_amount="amountFormat(item.live? item.live.view_amount: 0)"
 				  ></live-card>
 			</template>
 		</view>

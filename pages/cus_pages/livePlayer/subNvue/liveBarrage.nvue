@@ -16,13 +16,10 @@
 <script>
 	export default {
 		onLoad() {
-			uni.$on('danmu', (data) => {
-				const content = JSON.parse(data.msg)
-				this.items.push({
-					name: content.name, 
-					message: content.msg,
-				})
-				if(this.items.length > 6) {
+			uni.$on("showBarrage", (data) => {
+				const  content = JSON.parse(data.content)
+				this.items.push(content)
+				if(this.items.length > 7) {
 					this.items.shift()
 				}
 			})

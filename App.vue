@@ -33,19 +33,19 @@
 		onLoad() {
 			uni.getNetworkType({
 			    success: function (res) {
-			        console.log(res.networkType);
+			        // console.log(res.networkType);
 			    }
 			});
 			uni.onNetworkStatusChange(function (res) {
-			    console.log(res.isConnected);
-			    console.log(res.networkType);
+			    // console.log(res.isConnected);
+			    // console.log(res.networkType);
 			});
 		},
 		onShow: function() {
-			console.log('App Show')
+			// console.log('App Show')
 		},
 		onHide: function() {
-			console.log('App Hide')
+			// console.log('App Hide')
 		}
 	}
 </script>

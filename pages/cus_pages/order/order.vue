@@ -26,9 +26,9 @@
 								<text class="shop-name">{{item.shop_name}}</text>
 							</view>
 							<text v-if="item.order_state === '1' " class="state" style="color:#ed1c24">待付款</text>
-							<text v-if="item.order_state === '2' " class="state" style="color:#ed1c24">待收货</text>
-							<text v-if="item.order_state === '3' " class="state" style="color:#ed1c24">待评价</text>
-							<text v-if="item.order_state === '4' " class="state" style="color:#ed1c24">已评价</text>
+							<text v-if="item.order_state === '2' " class="state" style="color:#ed1c24">待发货</text>
+							<text v-if="item.order_state === '3' " class="state" style="color:#ed1c24">待收货</text>
+							<text v-if="item.order_state === '4' " class="state" style="color:#ed1c24">待评价</text>
 						</view>
 						
 						<view class="goods-box">
@@ -51,19 +51,22 @@
 							件商品 实付款
 							<text class="price">{{getPrice(item.goodsInfo)}}</text>
 						</view>
+						<view class="action-box b-t" v-if="item.order_state === '0'">
+							<button class="action-btn" @click="deleteOrder(item)">删除订单</button>
+						</view>
 						<view class="action-box b-t" v-if="item.order_state === '1'">
 							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
 							<button class="action-btn recom" @click="toPay(item.order_id)">立即支付</button>
 						</view>
 						<view class="action-box b-t" v-if="item.order_state === '2'">
-							<button class="action-btn recom" @click="confirmOrder(item)">确认收货</button>
+							<button class="action-btn recom" @click="remind">提醒发货</button>
 						</view>
 						<view class="action-box b-t" v-if="item.order_state === '3'">
-							<button class="action-btn" @click="deleteOrder(item)">删除订单</button>
-							<button class="action-btn recom" @click="appraise(item)">去评价</button>
+							<button class="action-btn recom" @click="confirmOrder(item)">确认收货</button>
 						</view>
 						<view class="action-box b-t" v-else-if="item.order_state === '4'">
 							<button class="action-btn" @click="deleteOrder(item)">删除订单</button>
+							<button class="action-btn recom" @click="appraise(item)">去评价</button>
 						</view>
 					</view> 
 					<uni-load-more :status="tabItem.loadingType"></uni-load-more>
@@ -99,19 +102,19 @@
 					},
 					{
 						state: 2,
-						text: '待收货',
+						text: '待发货',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 3,
-						text: '待评价',
+						text: '待收货',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 4,
-						text: '已完成',
+						text: '待评价',
 						loadingType: 'more',
 						orderList: []
 					}
@@ -121,6 +124,7 @@
 		
 		onLoad(options){
 			this.tabCurrentIndex = +options.state;
+			this.loadData()
 			if(options.state == 0){
 				this.loadData()
 			}
@@ -131,10 +135,8 @@
 				const result = await this.$apis.getOrderList(data)
 				if(result.code === "000000" && result.data) {
 					let orderList = this.dealData(result.data.orderList, result.data.orderGoods)
-					// console.log(result.data.orderList, result.data.orderGoods)
 					this.navList[this.tabCurrentIndex].orderList = orderList
 				} else {
-					// return []
 					this.navList[this.tabCurrentIndex].orderList = []
 				}
 			},
@@ -153,7 +155,6 @@
 				}
 				await this.getOrderByState(data)
 				if(this.navList[index].orderList.length === 0) {
-					console.log(this.navList[index].orderList)
 					navItem.loadingType = "noMore"
 					return;
 				}
@@ -185,19 +186,18 @@
 			    const data = { 
 					order_id: item.order_id,
 					shop_id: item.shop_id,
-					uid: this.$store.state.info.uid}
+					uid: this.$store.state.info.uid,
+				}
 			    const result = await this.$apis.deleteOrder(data)
 			    if(result.code === "000000") {
 			    	uni.hideLoading()
 					this.loadData()
-			    	uni.showToast({
-			    		title: "删除成功"
-			    	})
+					this.$apis.msg('删除成功')
 			    }
 			},
 			//取消订单
 			async cancelOrder(item){
-				console.log(item)
+				// console.log(item)
 				uni.showLoading({
 					title: '请稍后'
 				})
@@ -210,9 +210,7 @@
 				if(result.code === "000000") {
 					uni.hideLoading()
 					this.loadData()
-					uni.showToast({
-						title: "取消成功"
-					})
+					this.$apis.msg('取消成功')
 				}
 			},
 			//确认收货
@@ -229,14 +227,12 @@
 				if(result.code === "000000") {
 					uni.hideLoading()
 					this.loadData()
-					uni.showToast({
-						title: "确认成功"
-					})
+					this.$apis.msg('确认成功')
 				}
 			},
 			// 订单评价
 			appraise(item) {
-				console.log(item)
+				// console.log(item)
 				const order_id = item.order_id
 				uni.navigateTo({
 					url: "/pages/cus_pages/order/order-issue?"+
@@ -247,16 +243,21 @@
 						   "&specification="+item.goodsInfo[0].specification
 				})
 			},
+			// 提醒发货
+			remind() {
+				this.$apis.msg('提醒商家发货')
+			},
 			/** 
 			 *  @param {Array} shopInfo 
 			 *  @param {Array} goodsInfo 
 			 * 整合订单数据 
 			*/
 			dealData(shopInfo, goodsInfo) {
+				// console.log(shopInfo, goodsInfo)
 				shopInfo.forEach(item => item["goodsInfo"] = [])
 				shopInfo.forEach(item => {
 					goodsInfo.forEach(iitem => {
-						if(iitem.order_id === iitem.order_id && iitem.shop_id === iitem.shop_id) {
+						if(item.shop_id === iitem.shop_id  && item.order_id === iitem.order_id) {
 							item["goodsInfo"].push(iitem)
 						}
 					})
@@ -273,9 +274,7 @@
 		   },
 		   // 立即支付
 		   toPay(id) {
-			   uni.showToast({
-			   	title: '立即支付'
-			   })
+			   this.$apis.msg('立即支付')
 			   uni.redirectTo({
 			   	url: '../money/pay?order_id='+id
 			   })

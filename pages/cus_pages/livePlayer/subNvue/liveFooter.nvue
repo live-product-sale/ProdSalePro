@@ -22,7 +22,7 @@
 </template>
 
 <script>
-	
+	import { msg } from '@/apis/index.js'
 	export default {
 		data() {
 			return {
@@ -34,10 +34,7 @@
 		},
 		onLoad() {
 			//  监听键盘高度
-			uni.onKeyboardHeightChange(res => {
-			  // console.log("键盘高度",res.height)
-			  this.keyHeight= res.height
-			})
+			
 		},
 		methods: {
 			// 收起键盘
@@ -49,30 +46,30 @@
 			inputKey() {
 				this.isShop = false	
 				this.isFocus = true
+				uni.onKeyboardHeightChange(res => {
+				  // console.log("键盘高度",res.height)
+				  this.keyHeight= res.height
+				})
 			},
 			// 发送弹幕
 			sendbtn() {
 				if(this.barrage) {
-					uni.showToast({
-						title: '发送弹幕',
-						icon: 'none'
-					})
+					msg('发送弹幕')
 					uni.$emit('barrage', { msg: this.barrage })
 					this.barrage = ''
 					uni.hideKeyboard()
 				} else {
-					uni.showToast({
-						title:'您还没有输入内容',
-						icon: 'none'
-					})
+					msg('您还没有输入内容')
 				}
 			},
 			// 点击shop图标 展示产品列表
 			showCategory() {
-				uni.$emit('Product', { value: true })
 				const product = uni.getSubNVueById("liveProduct")
 				product.show("slide-in-bottom")
 			}
+		},
+		onUnload() {
+			uni.$off("barrage")
 		}
 	} 
 </script>
